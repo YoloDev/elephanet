@@ -9,7 +9,7 @@ Heavily influenced by the RavenDb .NET client, this libary provides a simple api
 At the moment, not much has been implemented.
 
 ```
-//create you poco
+
 public class Car
 {
  	public Guid Id {get;set;}
@@ -19,8 +19,11 @@ public class Car
 	public string NumberPlate {get;set;}
 }
 
-	//now shove it in the database
+	//create the datastore
 	DocumentStore store = new DocumentStore("Server=127.0.0.1;Port=5432;User Id=store_user;password=my super secret password;database=store;");
+	
+	
+	//create the object
 	var car = new Car {
 		Id = Guid.NewGuid(),
 		Make = "Audi",
@@ -29,13 +32,14 @@ public class Car
 		NumberPlate = "ABC029"
 	};
 
+	//save the object to the document store
 	using (var session = store.OpenSession())
 	{
 		session.Store<Car>(car);
 		session.SaveChanges();
 	}
 
-	//get the same car back out of the db
+	//get the same car back out of the document store
 	using (var session = store.OpenSession())
 	{
 		var car = session.Load<Car>(car.Id);
