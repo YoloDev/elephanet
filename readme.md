@@ -46,8 +46,17 @@ public class Car
 	}
 ```
 
+###Currently implemented###
+
+* You can load new documents to a unit of work cache (session.Store<T>());
+* You can save the unit of work cache to the database (session.SaveChanges());
+* You can retrieve documents from the database (session.Load<T>(your_id));
+* You can implement your own custom json serialization (uses NewtonSoft.Json by default), and it is easily overridable
+
 ###Still to come###
 
+* Updates
+* Deletes
 * Querying beyond a simple key fetch
 * MORE TESTS!
 * More docs
