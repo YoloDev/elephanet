@@ -1,4 +1,4 @@
-##Elephanet - A .NET api to postgresqls json.##
+##Elephanet - A .NET api to postgresql's json.##
 
 ###With an api thats easy to use###
 
