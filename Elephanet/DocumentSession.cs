@@ -51,7 +51,7 @@ namespace Elephanet
                 using (var command = _conn.CreateCommand())
                 {
                     command.CommandType = CommandType.Text;
-                    command.CommandText = String.Format(@"SELECT body FROM public.{0} WHERE id = :id LIMIT 1;", _documentStore.StoreInfo.Name);
+                    command.CommandText = String.Format(@"SELECT body FROM public.{0} WHERE id = :id LIMIT 1;", typeof(T).Name);
 
                     command.Parameters.AddWithValue(":id", id);
 
@@ -77,7 +77,7 @@ namespace Elephanet
             throw new NotImplementedException();
         }
 
-        public IEnumerable<T> Query<T>()
+        public IQueryable<T> Query<T>()
         {
             throw new NotImplementedException();
         }
@@ -91,13 +91,16 @@ namespace Elephanet
         void SaveInternal()
         {
             var storeInfo = _documentStore.StoreInfo.Name;
+            //make sure all the entities have tables, if not, created them
+
 
             foreach (var item in _entities)
             {
+                GetOrCreateTable(item.Value.GetType());
                 using (var command = _conn.CreateCommand())
                 {
                     command.CommandType = CommandType.Text;
-                    command.CommandText = String.Format(@"INSERT INTO public.{0} (id, body) VALUES (:id, :body);", _documentStore.StoreInfo.Name);
+                    command.CommandText = String.Format(@"INSERT INTO public.{0} (id, body) VALUES (:id, :body);", item.Value.GetType().Name);
 
                     command.Parameters.AddWithValue(":id", item.Key);
                     command.Parameters.AddWithValue(":body", _jsonConverter.Serialize(item.Value));
@@ -112,6 +115,62 @@ namespace Elephanet
             var id = IdentityFactory.SetEntityId(entity);
             _entities[id] = entity;
         }
+
+        private bool IndexDoesNotExist(Type type)
+        {
+            using (var command = _conn.CreateCommand())
+            {
+                command.CommandType = CommandType.Text;
+                command.CommandText = string.Format(@"select count(*)
+                from pg_indexes
+                where schemaname = 'public'
+                and tablename = '{0}'
+                and indexname = 'idx_{0}_body';", type.Name);
+                var indexCount = (Int64)command.ExecuteScalar();
+                return indexCount != 0;
+            }
+
+        }
+        private void CreateIndex(Type type)
+        {
+            if (IndexDoesNotExist(type))
+            {
+                using (var command = _conn.CreateCommand())
+                {
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = string.Format(@"CREATE INDEX idx_{0}_body ON {0} USING gin (body);", type.Name);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+
+        private void GetOrCreateTable(Type type)
+        {
+                try 
+                {
+                    using (var command = _conn.CreateCommand())
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.CommandText = String.Format(@"
+                            CREATE TABLE IF NOT EXISTS public.{0}
+                            (
+                                id uuid NOT NULL DEFAULT uuid_generate_v1(), 
+                                body jsonb NOT NULL, 
+                                created time without time zone NOT NULL DEFAULT now(), 
+                                row_version integer NOT NULL DEFAULT 1, 
+                                CONSTRAINT pk_{0} PRIMARY KEY (id)
+                            );", type.Name);
+                        command.ExecuteNonQuery();
+                        CreateIndex(type);
+                    }
+                }
+                catch (NpgsqlException exception)
+                {
+                    throw new Exception(String.Format("Could not create table {0}; see the inner exception for more information.", type.Name), exception);
+                }
+               
+            }
 
         public void Dispose()
         {
