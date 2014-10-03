@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using Npgsql;
 using System.Linq;
 using System.Data;
-using System;
-
 
 namespace Elephanet
 {
@@ -14,14 +12,18 @@ namespace Elephanet
         private NpgsqlConnection _conn;
         protected readonly Dictionary<Guid, object> _entities = new Dictionary<Guid, object>();
         readonly IJsonConverter _jsonConverter;
+        private JsonbQueryProvider _queryProvider;
+        private TableInfo _tableInfo;
       
 
         public DocumentSession(IDocumentStore documentStore)
         {
             _documentStore = documentStore;
+            _tableInfo = _documentStore.Conventions.TableInfo;
             _conn = new NpgsqlConnection(documentStore.ConnectionString);
             _conn.Open();
             _jsonConverter = documentStore.Conventions.JsonConverter;
+            _queryProvider = new JsonbQueryProvider(_conn, _jsonConverter);
         }
 
         public void Delete<T>(T entity)
@@ -31,6 +33,10 @@ namespace Elephanet
 
         public T Load<T>(Guid id)
         {
+            //TODO we really should be caching this somewhere, but I'll worry about that when it becomes an issue.
+            //required because need to make sure that the table exists before trying to query it.
+            GetOrCreateTable(typeof(T));
+
             //hit the db first, so we get most up-to-date
             var entity = LoadInternal<T>(id);
             //try the cache just incase hasn't been saved to db yet, but is in session
@@ -51,7 +57,7 @@ namespace Elephanet
                 using (var command = _conn.CreateCommand())
                 {
                     command.CommandType = CommandType.Text;
-                    command.CommandText = String.Format(@"SELECT body FROM public.{0} WHERE id = :id LIMIT 1;", typeof(T).Name);
+                    command.CommandText = String.Format(@"SELECT body FROM {0} WHERE id = :id LIMIT 1;", _tableInfo.TableNameWithSchema(typeof(T)));
 
                     command.Parameters.AddWithValue(":id", id);
 
@@ -77,9 +83,10 @@ namespace Elephanet
             throw new NotImplementedException();
         }
 
-        public IQueryable<T> Query<T>()
+        public IJsonbQueryable<T> Query<T>()
         {
-            throw new NotImplementedException();
+            IJsonbQueryable<T> query = new JsonbQueryable<T>(new JsonbQueryProvider(_conn, _jsonConverter));
+            return query;
         }
 
         public void SaveChanges()
@@ -90,9 +97,7 @@ namespace Elephanet
 
         void SaveInternal()
         {
-            var storeInfo = _documentStore.StoreInfo.Name;
             //make sure all the entities have tables, if not, created them
-
 
             foreach (var item in _entities)
             {
@@ -100,7 +105,7 @@ namespace Elephanet
                 using (var command = _conn.CreateCommand())
                 {
                     command.CommandType = CommandType.Text;
-                    command.CommandText = String.Format(@"INSERT INTO public.{0} (id, body) VALUES (:id, :body);", item.Value.GetType().Name);
+                    command.CommandText = String.Format(@"INSERT INTO {0} (id, body) VALUES (:id, :body);", _tableInfo.TableNameWithSchema(item.Value.GetType()));
 
                     command.Parameters.AddWithValue(":id", item.Key);
                     command.Parameters.AddWithValue(":body", _jsonConverter.Serialize(item.Value));
@@ -123,9 +128,9 @@ namespace Elephanet
                 command.CommandType = CommandType.Text;
                 command.CommandText = string.Format(@"select count(*)
                 from pg_indexes
-                where schemaname = 'public'
-                and tablename = '{0}'
-                and indexname = 'idx_{0}_body';", type.Name);
+                where schemaname = '{0}'
+                and tablename = '{1}'
+                and indexname = 'idx_{1}_body';", _tableInfo.Schema, _tableInfo.TableNameWithoutSchema(type));
                 var indexCount = (Int64)command.ExecuteScalar();
                 return indexCount != 0;
             }
@@ -138,7 +143,7 @@ namespace Elephanet
                 using (var command = _conn.CreateCommand())
                 {
                     command.CommandType = CommandType.Text;
-                    command.CommandText = string.Format(@"CREATE INDEX idx_{0}_body ON {0} USING gin (body);", type.Name);
+                    command.CommandText = string.Format(@"CREATE INDEX idx_{0}_body ON {0} USING gin (body);", _tableInfo.TableNameWithoutSchema(type));
                     command.ExecuteNonQuery();
                 }
             }
@@ -147,30 +152,33 @@ namespace Elephanet
 
         private void GetOrCreateTable(Type type)
         {
+            if (!_documentStore.StoreInfo.Tables.Any(c => c == _tableInfo.TableNameWithSchema(type)))
+            {
+                _documentStore.StoreInfo.Tables.Add(_tableInfo.TableNameWithSchema(type));
                 try 
                 {
                     using (var command = _conn.CreateCommand())
                     {
                         command.CommandType = CommandType.Text;
                         command.CommandText = String.Format(@"
-                            CREATE TABLE IF NOT EXISTS public.{0}
+                            CREATE TABLE IF NOT EXISTS {0}
                             (
                                 id uuid NOT NULL DEFAULT uuid_generate_v1(), 
                                 body jsonb NOT NULL, 
                                 created time without time zone NOT NULL DEFAULT now(), 
                                 row_version integer NOT NULL DEFAULT 1, 
-                                CONSTRAINT pk_{0} PRIMARY KEY (id)
-                            );", type.Name);
+                                CONSTRAINT pk_{1} PRIMARY KEY (id)
+                            );",_tableInfo.TableNameWithSchema(type), _tableInfo.TableNameWithoutSchema(type));
                         command.ExecuteNonQuery();
                         CreateIndex(type);
                     }
                 }
                 catch (NpgsqlException exception)
                 {
-                    throw new Exception(String.Format("Could not create table {0}; see the inner exception for more information.", type.Name), exception);
+                    throw new Exception(String.Format("Could not create table {0}; see the inner exception for more information.", _tableInfo.TableNameWithSchema(type)), exception);
                 }
-               
             }
+        }
 
         public void Dispose()
         {
