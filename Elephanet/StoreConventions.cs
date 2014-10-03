@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
+using Elephanet;
 
 namespace Elephanet
 {
@@ -7,10 +8,11 @@ namespace Elephanet
     {
 
         IJsonConverter _jsonConverter;
-
+        private TableInfo _tableInfo;
         public StoreConventions()
         {
             _jsonConverter = new JsonConverter();
+            _tableInfo = new TableInfo();
         }
 
         public StoreConventions(IJsonConverter jsonConverter)
@@ -23,34 +25,9 @@ namespace Elephanet
             get { return _jsonConverter; }
         }
 
-        public string TableName { get { return "store"; } }
-    }
-
-    public interface IStoreConventions
-    {
-        IJsonConverter JsonConverter { get; }
-        string TableName { get; }
-    }
-
-    public interface IJsonConverter
-    {
-        string Serialize<T>(T entity);
-        T Deserialize<T>(string json);
-    }
-    
-
-    public class JsonConverter : IJsonConverter
-    {
-
-        public string Serialize<T>(T entity)
+        public TableInfo TableInfo
         {
-            return JsonConvert.SerializeObject(entity);
+            get { return _tableInfo; }
         }
-
-        public T Deserialize<T>(string json)
-        {
-            return JsonConvert.DeserializeObject<T>(json);
-        }
-
     }
 }
