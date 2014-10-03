@@ -6,37 +6,33 @@ using System.Collections.Generic;
 
 namespace Elephanet
 {
-
     public class DocumentStore : IDocumentStore
     {
         private string _connectionString;
         readonly IStoreConventions _conventions;
         readonly IStoreInfo _storeInfo;
-        private string p;
-        private IStoreInfo testStore;
+        readonly List<string> _tableNames;
 
         public DocumentStore(string connectionString)
         {
             _connectionString = connectionString;
             _conventions = new StoreConventions();
-            _storeInfo = new StoreInfo();
-            GetOrCreateTable();
+            _storeInfo = new StoreInfo();;
+            _tableNames = new List<string>();
         }
 
-        public DocumentStore(string connectionString,IStoreConventions conventions)
+        public DocumentStore(string connectionString, IStoreConventions conventions)
         {
             _connectionString = connectionString;
             _conventions = conventions;
             _storeInfo = new StoreInfo();
-            GetOrCreateTable();
         }
 
-        public DocumentStore(string connectionString,IStoreConventions conventions, IStoreInfo storeInfo)
+        public DocumentStore(string connectionString, IStoreConventions conventions, IStoreInfo storeInfo)
         {
             _connectionString = connectionString;
             _conventions = conventions;
             _storeInfo = storeInfo;
-            GetOrCreateTable();
         }
 
         public DocumentStore(string connectionString, IStoreInfo storeInfo)
@@ -44,51 +40,11 @@ namespace Elephanet
             _connectionString = connectionString;
             _conventions = new StoreConventions();
             _storeInfo = storeInfo;
-            GetOrCreateTable();
         }
-
-        public void GetOrCreateTable()
-        {
-
-            object _lock = new object();
-            lock (_lock)
-            {
-                var connection = new NpgsqlConnection(_connectionString);
-                try
-                {
-                    connection.Open();
-
-                    using (var command = connection.CreateCommand())
-                    {
-                        command.CommandType = CommandType.Text;
-                        command.CommandText = String.Format(@"
-                            CREATE TABLE IF NOT EXISTS public.{0}
-                            (
-                                id uuid NOT NULL DEFAULT uuid_generate_v1(), 
-                                body json NOT NULL, 
-                                created time without time zone NOT NULL DEFAULT now(), 
-                                row_version integer NOT NULL DEFAULT 1, 
-                                CONSTRAINT pk_{0} PRIMARY KEY (id)
-                            );", _storeInfo.Name);
-                        command.ExecuteNonQuery();
-                    }
-                }
-                catch (NpgsqlException exception)
-                {
-                    throw new Exception(String.Format("Could not create table {0}; see the inner exception for more information.", _storeInfo.Name), exception);
-                }
-                finally
-                {
-                    connection.Dispose();
-                }
-            }
-        }
-
-      
 
         public IStoreConventions Conventions { get { return _conventions; }}
 
-      
+        public List<string> TableNames { get {return _tableNames;} }
 
         public IDocumentSession OpenSession()
         {
@@ -103,20 +59,51 @@ namespace Elephanet
         public  IStoreInfo StoreInfo { get {return _storeInfo;}}
 
 
-
-        public void Empty()
+        public void Destroy()
         {
-
               var connection = new NpgsqlConnection(_connectionString);
               try
               {
-                    connection.Open();
+                   connection.Open();
+                  foreach (var tablename in StoreInfo.Tables)
+                  {
                     using (var command = connection.CreateCommand())
                     {
                         command.CommandType = CommandType.Text;
-                        command.CommandText = String.Format(@"DELETE FROM public.{0};", _storeInfo.Name);
+                        command.CommandText = String.Format(@"drop table {0};", tablename);
+                        Console.WriteLine(command.CommandText);
                         command.ExecuteNonQuery();
                     }
+                  }
+              } 
+
+              catch (NpgsqlException exception)
+              {
+                    throw new Exception(String.Format("Could not drop table {0}; see the inner exception for more information.", _storeInfo.Name), exception);
+              }
+
+              finally
+              {
+                    connection.Dispose();
+              }
+        }
+
+        public void Empty()
+        {
+              var connection = new NpgsqlConnection(_connectionString);
+              try
+              {
+                   connection.Open();
+                  foreach (var tablename in StoreInfo.Tables)
+                  {
+                    using (var command = connection.CreateCommand())
+                    {
+                        command.CommandType = CommandType.Text;
+                        command.CommandText = String.Format(@"delete from {0};", tablename);
+                        Console.WriteLine(command.CommandText);
+                        command.ExecuteNonQuery();
+                    }
+                  }
               } 
 
               catch (NpgsqlException exception)
@@ -130,39 +117,4 @@ namespace Elephanet
               }
         }
     }
-
-    public interface IDocumentStore
-    {
-        IDocumentSession OpenSession();
-        string ConnectionString { get; }
-        IStoreConventions Conventions { get; }
-        IStoreInfo StoreInfo { get; }
-        void Empty();
-    }
-
-  
-
-    public class StoreInfo : IStoreInfo
-    {
-        private string _name;
-        public StoreInfo()
-        {
-            _name = "store";
-        }
-
-        public StoreInfo(string storeName)
-        {
-            _name = storeName;
-        }
-
-        public string Name { get { return _name; } }
-    }
-
-
-        public interface IStoreInfo 
-        {
-            string Name {get;}
-        }
-
-       
 }
