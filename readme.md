@@ -74,7 +74,7 @@ public class Car
 	//query by make
 	using (var session = store.OpenSession())
 	{
-		var audis = session.Query(new Sql(":make", new[]{"Audi"});
+		var audis = session.Query(new Sql(":make", new[]{"Audi"}));
 	}
 
 	
@@ -85,7 +85,7 @@ public class Car
 * You can load new documents to a unit of work cache (session.Store<T>());
 * You can save the unit of work cache to the database (session.SaveChanges());
 * You can retrieve individual documents from the database (session.Load<T>(your_id));
-* You can retrieve documents from the database via a basic query (session.Query<T>(new Sql(":property", new[] {"value"});)
+* You can retrieve documents from the database via a basic query (session.Query<T>(new Sql(":property", new[] {"value"}));)
 * You can implement your own custom json serialization (uses NewtonSoft.Json by default), and it is easily overridable
 
 ###Still to come###
