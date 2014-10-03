@@ -2,12 +2,22 @@
 using Shouldly;
 using System;
 using Ploeh.AutoFixture;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Elephanet.Tests
 {
-    public class Tests
+    public class Tests : IDisposable
     {
-    
+        private readonly StoreInfo _testStore;
+        private readonly DocumentStore _store;
+
+        public  Tests()
+        {
+            _testStore = new StoreInfo();
+            _store = new DocumentStore("Server=127.0.0.1;Port=5432;User id=store_user;password=my super secret password;database=store;");
+        }
+            
         [Fact]
         public void WillPass()
         {
@@ -17,29 +27,22 @@ namespace Elephanet.Tests
         [Fact]
         public void NewStore_ConnectionStringShouldBe_SameAsCtor()
         {
-            IStoreInfo testStore = new StoreInfo();
-            DocumentStore store = new DocumentStore("Server=127.0.0.1;Port=5432;User id=store_user;password=my super secret password;database=store;");
-            store.ConnectionString.ShouldBe("Server=127.0.0.1;Port=5432;User id=store_user;password=my super secret password;database=store;");
+            _store.ConnectionString.ShouldBe("Server=127.0.0.1;Port=5432;User id=store_user;password=my super secret password;database=store;");
         }
 
         [Fact]
         public void Store_Should_OpenSession()
         {
-            IStoreInfo testStore = new StoreInfo();
-            DocumentStore store = new DocumentStore("Server=127.0.0.1;Port=5432;User id=store_user;password=my super secret password;database=store;");
-            using (var session = store.OpenSession())
+            using (var session = _store.OpenSession())
             {
                 //not really doing anything
             }
-
         }
 
         [Fact]
         public void SessionStore_Should_NotThrow()
         {
-            IStoreInfo testStore = new StoreInfo();
-            DocumentStore store = new DocumentStore("Server=127.0.0.1;Port=5432;User id=store_user;password=my super secret password;database=store;");
-            using (var session = store.OpenSession())
+            using (var session = _store.OpenSession())
             {
                 var car = new Car
                 {
@@ -58,9 +61,7 @@ namespace Elephanet.Tests
         [Fact]
         public void SessionSaveChanges_Should_SaveChanges()
         {
-            IStoreInfo testStore = new StoreInfo();
-            DocumentStore store = new DocumentStore("Server=127.0.0.1;Port=5432;User id=store_user;password=my super secret password;database=store;");
-            using (var session = store.OpenSession())
+            using (var session = _store.OpenSession())
             {
                 var car = new Car
                 {
@@ -80,12 +81,10 @@ namespace Elephanet.Tests
         [Fact]
         public void StoringAnEnitityAndFetchingWithinSession_Should_ReturnEntity()
         {
-            IStoreInfo testStore = new StoreInfo();
-            DocumentStore store = new DocumentStore("Server=127.0.0.1;Port=5432;User id=store_user;password=my super secret password;database=store;");
 
             var dummyCar = new Fixture().Create<Car>();
 
-            using (var session = store.OpenSession())
+            using (var session = _store.OpenSession())
             {
                 session.Store<Car>(dummyCar);
                 var result = session.Load<Car>(dummyCar.Id);
@@ -101,28 +100,23 @@ namespace Elephanet.Tests
         [Fact]
         public void NewStoreWithNoCtors_Should_SetConventions()
         {
-            IStoreInfo testStore = new StoreInfo();
-            DocumentStore store = new DocumentStore("Server=127.0.0.1;Port=5432;User id=store_user;password=my super secret password;database=store;");
-            
-            store.StoreInfo.ShouldNotBe(null);
-            store.Conventions.ShouldNotBe(null);
+            _store.StoreInfo.ShouldNotBe(null);
+            _store.Conventions.ShouldNotBe(null);
         }
 
         [Fact]
         public void SaveSessionThenLoading_Should_ReturnEntity()
         {
-            IStoreInfo testStore = new StoreInfo();
-            DocumentStore store = new DocumentStore("Server=127.0.0.1;Port=5432;User id=store_user;password=my super secret password;database=store;");
 
             var dummyCar = new Fixture().Create<Car>();
 
-            using (var session = store.OpenSession())
+            using (var session = _store.OpenSession())
             {
                 session.Store<Car>(dummyCar);
                 session.SaveChanges();
             }
 
-            using (var session = store.OpenSession())
+            using (var session = _store.OpenSession())
             {
                 var car = session.Load<Car>(dummyCar.Id);
                 car.Id.ShouldBe(dummyCar.Id);
@@ -136,37 +130,34 @@ namespace Elephanet.Tests
         [Fact]
         public void SaveChangesWithMultipleDifferentClasses_Should_Save()
         {
-            IStoreInfo testStore = new StoreInfo();
-            DocumentStore store = new DocumentStore("Server=127.0.0.1;Port=5432;User id=store_user;password=my super secret password;database=store;");
 
             var dummyCar = new Fixture().Create<Car>();
             var dummyBike = new Fixture().Create<Bike>();
 
-            using (var session = store.OpenSession())
+            using (var session = _store.OpenSession())
             {
                 session.Store<Car>(dummyCar);
                 session.Store<Bike>(dummyBike);
                 session.SaveChanges();
             }
 
-            using (var session = store.OpenSession())
+            using (var session = _store.OpenSession())
             {
                 session.Load<Bike>(dummyBike.Id).ShouldNotBe(null);
                 session.Load<Car>(dummyCar.Id).ShouldNotBe(null);
             }
         }
 
+
         [Fact]
-        public void SessionQueryByOneValue_Should_ReturnCorrectEntities()
+        public void SessionCanQueryByStraightSqlString()
         {
-            IStoreInfo testStore = new StoreInfo(storeName:"test_store");
-            DocumentStore store = new DocumentStore("Server=127.0.0.1;Port=5432;User id=store_user;password=my super secret password;database=store;", testStore);
 
             var dummyCars = new Fixture().Build<Car>()
                 .With(x => x.Make, "Subaru")
-                .CreateMany();
+                .CreateMany().ToList();
 
-            using (var session = store.OpenSession())
+            using (var session = _store.OpenSession())
             {
                 foreach (var car in dummyCars)
                 {
@@ -175,14 +166,19 @@ namespace Elephanet.Tests
                 session.SaveChanges();
             }
 
-            using (var session = store.OpenSession())
+            using (var session = _store.OpenSession())
             {
-                //var results = session.Query<Car>().Where(x => x.Name == "Subaru");
-                //results.ShouldNotBeEmpty();
+
+                var results = session.Query<Car>().Where(new Sql<Car>(":make", new []{"Subaru"}));
+                results.ShouldNotBeEmpty();
+                results[0].Id.ShouldBe(dummyCars[0].Id);
             }
         }
-    }
 
-   
+        public void Dispose()
+        {
+            _store.Destroy();
+        }
+    }
 }
 
