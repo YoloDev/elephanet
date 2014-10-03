@@ -10,7 +10,7 @@ namespace Elephanet
         T Load<T>(Guid id);
         T[] Load<T>(params Guid[] ids);
         T[] Load<T>(IEnumerable<Guid> ids);
-        IQueryable<T> Query<T>();
+        IJsonbQueryable<T> Query<T>();
         void SaveChanges();
         void Store<T>(T entity);
     }
