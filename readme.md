@@ -24,7 +24,7 @@ public class Car
 	
 	
 	//create the object
-	var car = new Car {
+	var myAudi = new Car {
 		Id = Guid.NewGuid(),
 		Make = "Audi",
 		Model = "A8",
@@ -35,28 +35,63 @@ public class Car
 	//save the object to the document store
 	using (var session = store.OpenSession())
 	{
-		session.Store<Car>(car);
+		session.Store<Car>(myAudi);
 		session.SaveChanges();
 	}
 
 	//get the same car back out of the document store
 	using (var session = store.OpenSession())
 	{
-		var car = session.Load<Car>(car.Id);
+		var car = session.Load<Car>(myAudi.Id);
 	}
+
+
+	//create a couple of other cars	
+	var myFord = new Car {
+		Id = Guid.NewGuid(),
+		Make = "Ford",
+		Model = "Mustang",
+		ImageUrl = "http://some_image_url",
+		NumberPlate = "XYZ999"
+	};
+
+	var myOldAudi {
+		Id = Guid.NewGuid(),
+		Make = "Audi",
+		Model = "A5",
+		ImageUrl = "http://some_image_url",
+		NumberPlate = "ABC002"
+	};
+
+	//store these other cars
+	using (var session = store.OpenSession())
+	{
+		session.Store<Car>(myOldAudi);
+		session.Store<Car>(myFord);
+		session.SaveChanges();
+	}
+
+	//query by make
+	using (var session = store.OpenSession())
+	{
+		var audis = session.Query(new Sql(":make", new[]{"Audi"});
+	}
+
+	
 ```
 
 ###Currently implemented###
 
 * You can load new documents to a unit of work cache (session.Store<T>());
 * You can save the unit of work cache to the database (session.SaveChanges());
-* You can retrieve documents from the database (session.Load<T>(your_id));
+* You can retrieve individual documents from the database (session.Load<T>(your_id));
+* You can retrieve documents from the database via a basic query (session.Query<T>(new Sql(":property", new[] {"value"});)
 * You can implement your own custom json serialization (uses NewtonSoft.Json by default), and it is easily overridable
 
 ###Still to come###
 
 * Updates
 * Deletes
-* Querying beyond a simple key fetch
+* linq provider
 * MORE TESTS!
 * More docs
