@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NSubstitute">
+      <HintPath>..\packages\NSubstitute.1.7.2.0\lib\NET45\NSubstitute.dll</HintPath>
+    </Reference>
     <Reference Include="Ploeh.AutoFixture">
       <HintPath>..\packages\AutoFixture.3.20.1\lib\net40\Ploeh.AutoFixture.dll</HintPath>
     </Reference>
@@ -50,6 +53,9 @@
   <ItemGroup>
     <Compile Include="Bike.cs" />
     <Compile Include="Car.cs" />
+    <Compile Include="LinqTests.cs" />
+    <Compile Include="StoreInfoTests.cs" />
+    <Compile Include="TableInfoTests.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

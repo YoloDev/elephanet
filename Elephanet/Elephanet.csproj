@@ -51,11 +51,31 @@
   <ItemGroup>
     <Compile Include="DocumentSession.cs" />
     <Compile Include="EntityException.cs" />
+    <Compile Include="Expressions\ExpressionEvaluator.cs" />
+    <Compile Include="Expressions\SqlExpressionType.cs" />
+    <Compile Include="Expressions\JsonbExpression.cs" />
+    <Compile Include="Expressions\JsonbExpressionType.cs" />
+    <Compile Include="Expressions\SelectExpression.cs" />
+    <Compile Include="Expressions\SqlExpression.cs" />
     <Compile Include="IdentityFactory.cs" />
     <Compile Include="IDocumentSession.cs" />
+    <Compile Include="IJsonConverter.cs" />
+    <Compile Include="IStoreConventions.cs" />
+    <Compile Include="IStore.cs" />
+    <Compile Include="IStoreInfo.cs" />
+    <Compile Include="JsonbQueryProvider.cs" />
+    <Compile Include="Expressions\JsonbTable.cs" />
+    <Compile Include="JsonConverter.cs" />
+    <Compile Include="Queryable.cs" />
+    <Compile Include="Extensions\QueryExtension.cs" />
+    <Compile Include="Sql.cs" />
     <Compile Include="Store.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StoreConventions.cs" />
+    <Compile Include="Expressions\JsonbExpressionVisitor.cs" />
+    <Compile Include="StoreInfo.cs" />
+    <Compile Include="TableInfo.cs" />
+    <Compile Include="TypeHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
