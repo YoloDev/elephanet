@@ -67,8 +67,6 @@ namespace Elephanet
 
         }
 
-
-
         IQueryProvider IQueryable.Provider
         {
             get { return (IJsonbQueryProvider)_provider; }
