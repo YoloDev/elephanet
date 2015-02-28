@@ -68,6 +68,7 @@
     <Compile Include="JsonConverter.cs" />
     <Compile Include="Queryable.cs" />
     <Compile Include="Extensions\QueryExtension.cs" />
+    <Compile Include="QueryTranslator.cs" />
     <Compile Include="Sql.cs" />
     <Compile Include="Store.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
