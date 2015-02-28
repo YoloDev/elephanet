@@ -64,7 +64,11 @@ namespace Elephanet
         public string CommandText()
         {
             return _provider.GetQueryText(_expression);
+        }
 
+        public override string ToString()
+        {
+            return _provider.GetQueryText(_expression);
         }
 
         IQueryProvider IQueryable.Provider
