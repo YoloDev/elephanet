@@ -6,21 +6,12 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Npgsql;
 using System.Data;
+using System.Text;
 
 using Elephanet.Expressions;
 
 namespace Elephanet
 {
-
-    public class QueryTranslator
-    {
-        public string Translate(Expression expression)
-        {
-            Type elementType = TypeSystem.GetElementType(expression.Type);
-            return string.Format("select body from {0};",elementType.Name.ToLower());
-        }
-    }
-
     public interface IJsonbQueryProvider : IQueryProvider
     {
         string GetQueryText(Expression expression);
@@ -28,18 +19,17 @@ namespace Elephanet
         IJsonConverter JsonConverter { get; }
     }
 
-
     public class JsonbQueryProvider : IJsonbQueryProvider
     {
         private readonly NpgsqlConnection _conn;
         private readonly IJsonConverter _jsonConverter;
-        private JsonbExpressionVisitor _translator;
+        private QueryTranslator _translator;
 
         public JsonbQueryProvider(NpgsqlConnection connection, IJsonConverter jsonConverter)
         {
             _conn = connection;
             _jsonConverter = jsonConverter;
-            _translator = new JsonbExpressionVisitor();
+            _translator = new QueryTranslator();
         }
 
         public NpgsqlConnection Connection { get { return _conn; } }
@@ -47,11 +37,11 @@ namespace Elephanet
 
         public object Execute(Expression expression)
         {
-            _translator.Visit(expression);
-            _translator.Command.Connection = _conn;
 
-            using (var command = _translator.Command)
+            string sql = _translator.Translate(expression);
+            using (var command = new NpgsqlCommand())
             {
+                command.CommandText = sql;
 
                 Type elementType = TypeSystem.GetElementType(expression.Type);
                 Type listType = typeof(List<>).MakeGenericType(elementType);
@@ -61,8 +51,8 @@ namespace Elephanet
                 {
                     if (reader.Read())
                     {
-                        object car = _jsonConverter.Deserialize(reader.GetString(0), elementType);
-                        list.Add(car);
+                        object entity = _jsonConverter.Deserialize(reader.GetString(0), elementType);
+                        list.Add(entity);
                     }
                 }
 
@@ -74,10 +64,8 @@ namespace Elephanet
 
         public string GetQueryText(Expression expression)
         {
-            _translator.Visit(expression);
-            return _translator.Command.CommandText;
+            return _translator.Translate(expression);
         }
-
 
         T IQueryProvider.Execute<T>(Expression expression)
         {
