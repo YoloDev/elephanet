@@ -14,7 +14,6 @@ namespace Elephanet
 {
     public interface IJsonbQueryProvider : IQueryProvider
     {
-        string GetQueryText(Expression expression);
         NpgsqlConnection Connection {get;}
         IJsonConverter JsonConverter { get; }
     }
@@ -47,7 +46,7 @@ namespace Elephanet
 
                 using (var reader = command.ExecuteReader())
                 {
-                    if (reader.Read())
+                    while (reader.Read())
                     {
                         object entity = _jsonConverter.Deserialize(reader.GetString(0), elementType);
                         list.Add(entity);
@@ -58,11 +57,6 @@ namespace Elephanet
 
             }
             
-        }
-
-        public string GetQueryText(Expression expression)
-        {
-            return _translator.Translate(expression);
         }
 
         T IQueryProvider.Execute<T>(Expression expression)

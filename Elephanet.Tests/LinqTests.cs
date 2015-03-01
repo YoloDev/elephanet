@@ -10,17 +10,17 @@ using NSubstitute;
 
 namespace Elephanet.Tests
 {
-    public class LinqTests
+    public class LinqTests : IDisposable
     {
         private IDocumentStore _store;
 
         public LinqTests()
         {
             _store = new DocumentStore("Server=127.0.0.1;Port=5432;User id=store_user;password=my super secret password;database=store;");
+            CreateDummyCars();
         }
 
-        [Fact]
-        public void WherePredicate_Should_Build()
+        public void CreateDummyCars()
         {
 
             var dummyCars = new Fixture().Build<Car>()
@@ -36,20 +36,15 @@ namespace Elephanet.Tests
                 session.SaveChanges();
             }
 
-            using (var session = _store.OpenSession())
-            {
-                var results = session.Query<Car>().Where(x => x.Make == "Subaru");
-                results.ShouldNotBeEmpty();
-            }
         }
 
         [Fact]
-        public void ExpressionTest()
+        public void WherePredicate_Should_Build()
         {
             using (var session = _store.OpenSession())
             {
-                var query = session.Query<Car>();
-//                query.CommandText().ShouldBe("select body from public.elephanet_tests_car;");
+                var results = session.Query<Car>().Where(x => x.Make == "Subaru").ToList();
+                results.ShouldNotBeEmpty();
             }
         }
 
@@ -58,12 +53,20 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var query = session.Query<Car>().Where(c => c.Make == "Subaru");
-                
-                var cars = query.ToList();
-                //query.Provider.ToString().ShouldBe("select body from public.elephanet_tests_car where body @> '{\"Make\":\"Subaru\"}';");
-                //query.CommandText().ShouldBe("select body from public.elephanet_tests_car where body @> '{\"Make\":\"Subaru\"}';");
+                var results = session.Query<Car>().Where(c => c.Make == "Subaru");
+                var cars = results.ToList();
+                cars.Count.ShouldBe(3);
+                cars.ShouldBeOfType<List<Car>>();
+                cars.ForEach(c => c.Make.ShouldBe("Subaru"));
               
+            }
+        }
+
+        public void Dispose()
+        {
+            using (var session = _store.OpenSession())
+            {
+                session.DeleteAll<Car>();
             }
         }
     }

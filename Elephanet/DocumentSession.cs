@@ -31,6 +31,17 @@ namespace Elephanet
             throw new NotImplementedException();
         }
 
+        public void DeleteAll<T>()
+        {
+                using (var command = _conn.CreateCommand())
+                {
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = String.Format(@"DELETE FROM {0};", _tableInfo.TableNameWithSchema(typeof(T)));
+                    command.ExecuteNonQuery();
+                }
+
+        }
+
         public T Load<T>(Guid id)
         {
             //TODO we really should be caching this somewhere, but I'll worry about that when it becomes an issue.

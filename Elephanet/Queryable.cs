@@ -10,12 +10,10 @@ namespace Elephanet
 
     public interface IJsonbQueryable<T>: IOrderedQueryable<T>
     {
-        string CommandText();
     }
 
     public interface IJsonbQueryable: IOrderedQueryable
     {
-        string CommandText();
     }
 
    public class JsonbQueryable<T> : IJsonbQueryable<T>  
@@ -61,16 +59,6 @@ namespace Elephanet
             return ((IEnumerable)_provider.Execute(_expression)).GetEnumerator();
         }
  
-        public string CommandText()
-        {
-            return _provider.GetQueryText(_expression);
-        }
-
-        public override string ToString()
-        {
-            return _provider.GetQueryText(_expression);
-        }
-
         IQueryProvider IQueryable.Provider
         {
             get { return (IJsonbQueryProvider)_provider; }

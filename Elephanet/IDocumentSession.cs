@@ -13,5 +13,6 @@ namespace Elephanet
         IJsonbQueryable<T> Query<T>();
         void SaveChanges();
         void Store<T>(T entity);
+        void DeleteAll<T1>();
     }
 }
