@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7B67E4BB-55E4-4976-AA8E-72448CDE9E69}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Elephanet.Console</RootNamespace>
+    <AssemblyName>Elephanet.Console</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Ploeh.AutoFixture">
+      <HintPath>..\packages\AutoFixture.3.20.1\lib\net40\Ploeh.AutoFixture.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Elephanet.Tests\Elephanet.Tests.csproj">
+      <Project>{1156667a-85f7-493c-bf33-f22284134559}</Project>
+      <Name>Elephanet.Tests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Elephanet\Elephanet.csproj">
+      <Project>{f6f93a0a-0eb1-47a5-9089-db6f56369f98}</Project>
+      <Name>Elephanet</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ProfilingSessions\Session20150301_201237.sdps" />
+    <Content Include="ProfilingSessions\Session20150301_202057.sdps" />
+    <Content Include="ProfilingSessions\Session20150301_203621.sdps" />
+    <Content Include="ProfilingSessions\Session20150301_203903.sdps" />
+    <Content Include="ProfilingSessions\Session20150301_204127.sdps" />
+    <Content Include="ProfilingSessions\Session20150301_204751.sdps" />
+    <Content Include="ProfilingSessions\Session20150301_205116.sdps" />
+    <Content Include="ProfilingSessions\Session20150301_205356.sdps" />
+    <Content Include="ProfilingSessions\Session20150301_205616.sdps" />
+    <Content Include="ProfilingSessions\Session20150301_210517.sdps" />
+    <Content Include="ProfilingSessions\Session20150301_214000.sdps" />
+    <Content Include="ProfilingSessions\Session20150301_214337.sdps" />
+    <Content Include="ProfilingSessions\Session20150301_215923.sdps" />
+    <Content Include="ProfilingSessions\Session20150301_220200.sdps" />
+    <Content Include="ProfilingSessions\Session20150301_220752.sdps" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

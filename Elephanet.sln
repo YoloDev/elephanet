@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elephanet", "Elephanet\Elephanet.csproj", "{F6F93A0A-0EB1-47A5-9089-DB6F56369F98}"
 EndProject
@@ -11,6 +11,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{A70354
 	ProjectSection(SolutionItems) = preProject
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{64298DF8-AB03-405A-9530-C036710DDBC2}"
+	ProjectSection(SolutionItems) = preProject
+		Performance1.psess = Performance1.psess
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Elephanet.Console", "Elephanet.Console\Elephanet.Console.csproj", "{7B67E4BB-55E4-4976-AA8E-72448CDE9E69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +33,10 @@ Global
 		{1156667A-85F7-493C-BF33-F22284134559}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1156667A-85F7-493C-BF33-F22284134559}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1156667A-85F7-493C-BF33-F22284134559}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B67E4BB-55E4-4976-AA8E-72448CDE9E69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B67E4BB-55E4-4976-AA8E-72448CDE9E69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B67E4BB-55E4-4976-AA8E-72448CDE9E69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B67E4BB-55E4-4976-AA8E-72448CDE9E69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
