@@ -23,7 +23,7 @@ namespace Elephanet
             _conn = new NpgsqlConnection(documentStore.ConnectionString);
             _conn.Open();
             _jsonConverter = documentStore.Conventions.JsonConverter;
-            _queryProvider = new JsonbQueryProvider(_conn, _jsonConverter);
+            _queryProvider = new JsonbQueryProvider(_conn, _jsonConverter, _tableInfo);
         }
 
         public void Delete<T>(T entity)
@@ -85,7 +85,7 @@ namespace Elephanet
 
         public IJsonbQueryable<T> Query<T>()
         {
-            IJsonbQueryable<T> query = new JsonbQueryable<T>(new JsonbQueryProvider(_conn, _jsonConverter));
+            IJsonbQueryable<T> query = new JsonbQueryable<T>(new JsonbQueryProvider(_conn, _jsonConverter, _tableInfo));
             return query;
         }
 

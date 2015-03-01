@@ -25,11 +25,11 @@ namespace Elephanet
         private readonly IJsonConverter _jsonConverter;
         private QueryTranslator _translator;
 
-        public JsonbQueryProvider(NpgsqlConnection connection, IJsonConverter jsonConverter)
+        public JsonbQueryProvider(NpgsqlConnection connection, IJsonConverter jsonConverter, TableInfo tableInfo)
         {
             _conn = connection;
             _jsonConverter = jsonConverter;
-            _translator = new QueryTranslator();
+            _translator = new QueryTranslator(tableInfo);
         }
 
         public NpgsqlConnection Connection { get { return _conn; } }
@@ -37,12 +37,10 @@ namespace Elephanet
 
         public object Execute(Expression expression)
         {
-
             string sql = _translator.Translate(expression);
-            using (var command = new NpgsqlCommand())
+            Console.WriteLine(sql);
+            using (var command = new NpgsqlCommand(sql,_conn))
             {
-                command.CommandText = sql;
-
                 Type elementType = TypeSystem.GetElementType(expression.Type);
                 Type listType = typeof(List<>).MakeGenericType(elementType);
                 var list = (IList)Activator.CreateInstance(listType);

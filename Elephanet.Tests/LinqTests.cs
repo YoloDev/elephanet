@@ -49,7 +49,7 @@ namespace Elephanet.Tests
             using (var session = _store.OpenSession())
             {
                 var query = session.Query<Car>();
-                query.CommandText().ShouldBe("select body from public.elephanet_tests_car;");
+//                query.CommandText().ShouldBe("select body from public.elephanet_tests_car;");
             }
         }
 
@@ -59,6 +59,9 @@ namespace Elephanet.Tests
             using (var session = _store.OpenSession())
             {
                 var query = session.Query<Car>().Where(c => c.Make == "Subaru");
+                
+                var cars = query.ToList();
+                //query.Provider.ToString().ShouldBe("select body from public.elephanet_tests_car where body @> '{\"Make\":\"Subaru\"}';");
                 //query.CommandText().ShouldBe("select body from public.elephanet_tests_car where body @> '{\"Make\":\"Subaru\"}';");
               
             }
