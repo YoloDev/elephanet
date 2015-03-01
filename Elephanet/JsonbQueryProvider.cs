@@ -9,6 +9,7 @@ using System.Data;
 using System.Text;
 
 using Elephanet.Expressions;
+using Elephanet.Serialization;
 
 namespace Elephanet
 {

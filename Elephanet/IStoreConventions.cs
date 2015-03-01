@@ -1,4 +1,5 @@
-﻿namespace Elephanet
+﻿using Elephanet.Serialization;
+namespace Elephanet
 {
     public interface IStoreConventions
     {
