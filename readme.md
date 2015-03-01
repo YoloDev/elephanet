@@ -6,7 +6,7 @@ This is VERY not ready for production.  I have NOT used it in production, so bew
 
 Heavily influenced by the RavenDb .NET client, this libary provides a simple api to allow easy use of postgres as a document store, taking advantage of Postgresql 9.4 and its new json indexing, allowing for fast querying of native json objects.
 
-At the moment, not much has been implemented.
+At the moment, the implementation is limited, but is getting closer to something useable
 
 ```
 
@@ -74,7 +74,7 @@ public class Car
 	//query by make
 	using (var session = store.OpenSession())
 	{
-		var audis = session.Query(new Sql(":make", new[]{"Audi"}));
+		var audis = session.Query<Car>().Where(c => c.Make == "Audi").ToList();
 	}
 
 	
@@ -85,13 +85,13 @@ public class Car
 * You can load new documents to a unit of work cache (session.Store<T>());
 * You can save the unit of work cache to the database (session.SaveChanges());
 * You can retrieve individual documents from the database (session.Load<T>(your_id));
-* You can retrieve documents from the database via a basic query (session.Query<T>(new Sql(":property", new[] {"value"}));)
-* You can implement your own custom json serialization (uses NewtonSoft.Json by default), and it is easily overridable
+* You can query via an objects property using the IQueryable linq provider (session.Query<Car>(c => c.Make == "Ford");
+* You can implement your own custom json serialization (uses Jil by default), and it is easily overridable, there is an Json.Net one there as well
 
 ###Still to come###
 
 * Updates
-* Deletes
-* linq provider
+* Individual object Deletes
+* more linq provider support.  At this stage, only the Where equality check is done.
 * MORE TESTS!
 * More docs
