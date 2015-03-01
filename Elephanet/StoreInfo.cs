@@ -6,14 +6,14 @@ namespace Elephanet
     public class StoreInfo : IStoreInfo
     {
         private string _name;
-        readonly List<string> _tableNames;
+        readonly HashSet<string> _tableNames;
         public StoreInfo()
         {
             _name = "store";
-            _tableNames = new List<string>();
+            _tableNames = new HashSet<string>();
         }
 
-        public List<string> Tables { get { return _tableNames; } }
+        public HashSet<string> Tables { get { return _tableNames; } }
 
         public void Add(string tableName)
         {
