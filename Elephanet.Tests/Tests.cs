@@ -165,14 +165,6 @@ namespace Elephanet.Tests
                 }
                 session.SaveChanges();
             }
-
-            using (var session = _store.OpenSession())
-            {
-
-                var results = session.Query<Car>().Where(new Sql<Car>(":make", new []{"Subaru"}));
-                results.ShouldNotBeEmpty();
-                results[0].Id.ShouldBe(dummyCars[0].Id);
-            }
         }
 
         public void Dispose()
