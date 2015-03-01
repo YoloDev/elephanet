@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Npgsql;
 using System.Linq;
 using System.Data;
+using Elephanet.Serialization;
 
 namespace Elephanet
 {
@@ -44,8 +45,7 @@ namespace Elephanet
 
         public T Load<T>(Guid id)
         {
-            //TODO we really should be caching this somewhere, but I'll worry about that when it becomes an issue.
-            //required because need to make sure that the table exists before trying to query it.
+         
             GetOrCreateTable(typeof(T));
 
             //hit the db first, so we get most up-to-date
@@ -113,6 +113,7 @@ namespace Elephanet
             foreach (var item in _entities)
             {
                 GetOrCreateTable(item.Value.GetType());
+
                 using (var command = _conn.CreateCommand())
                 {
                     command.CommandType = CommandType.Text;
@@ -120,7 +121,6 @@ namespace Elephanet
 
                     command.Parameters.AddWithValue(":id", item.Key);
                     command.Parameters.AddWithValue(":body", _jsonConverter.Serialize(item.Value));
-
                     command.ExecuteNonQuery();
                 }
             }
@@ -143,7 +143,7 @@ namespace Elephanet
                 and tablename = '{1}'
                 and indexname = 'idx_{1}_body';", _tableInfo.Schema, _tableInfo.TableNameWithoutSchema(type));
                 var indexCount = (Int64)command.ExecuteScalar();
-                return indexCount != 0;
+                return indexCount == 0;
             }
 
         }
@@ -163,7 +163,7 @@ namespace Elephanet
 
         private void GetOrCreateTable(Type type)
         {
-            if (!_documentStore.StoreInfo.Tables.Any(c => c == _tableInfo.TableNameWithSchema(type)))
+            if (!_documentStore.StoreInfo.Tables.Contains(_tableInfo.TableNameWithSchema(type)))
             {
                 _documentStore.StoreInfo.Tables.Add(_tableInfo.TableNameWithSchema(type));
                 try 
@@ -181,12 +181,19 @@ namespace Elephanet
                                 CONSTRAINT pk_{1} PRIMARY KEY (id)
                             );",_tableInfo.TableNameWithSchema(type), _tableInfo.TableNameWithoutSchema(type));
                         command.ExecuteNonQuery();
-                        CreateIndex(type);
                     }
                 }
-                catch (NpgsqlException exception)
+                catch (Exception exception)
                 {
                     throw new Exception(String.Format("Could not create table {0}; see the inner exception for more information.", _tableInfo.TableNameWithSchema(type)), exception);
+                }
+                try
+                {
+                        CreateIndex(type);
+                }
+                catch (Exception exception)
+                {
+                    throw new Exception(String.Format("Could not create index on table {0}; see the inner exception for more information.", _tableInfo.TableNameWithSchema(type)), exception);
                 }
             }
         }
