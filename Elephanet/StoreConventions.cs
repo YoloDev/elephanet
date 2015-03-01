@@ -1,6 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Elephanet;
+using Elephanet.Serialization;
 
 namespace Elephanet
 {
@@ -11,7 +12,7 @@ namespace Elephanet
         private TableInfo _tableInfo;
         public StoreConventions()
         {
-            _jsonConverter = new JsonConverter();
+            _jsonConverter = new JilJsonConverter();
             _tableInfo = new TableInfo();
         }
 
