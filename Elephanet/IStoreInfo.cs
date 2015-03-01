@@ -6,7 +6,7 @@ namespace Elephanet
     public interface IStoreInfo
     {
         string Name { get; }
-        List<string> Tables { get; }
+        HashSet<string> Tables { get; }
         void Add(string tableName);
     }
 }
