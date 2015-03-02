@@ -156,7 +156,7 @@ namespace Elephanet.Tests
             var dummyCars = new Fixture().Build<Car>()
                 .With(x => x.Make, "Subaru")
                 .CreateMany().ToList();
-
+            //setup
             using (var session = _store.OpenSession())
             {
                 foreach (var car in dummyCars)
@@ -165,7 +165,7 @@ namespace Elephanet.Tests
                 }
                 session.SaveChanges();
             }
-
+            //delete
             using (var session = _store.OpenSession())
             {
                 foreach (var car in dummyCars)
@@ -174,7 +174,7 @@ namespace Elephanet.Tests
                     session.SaveChanges();
                 }
             }
-
+            //check
             using (var session = _store.OpenSession())
             {
                 var records = session.Query<Car>().Where(c => c.Make == "Subaru").ToList();
