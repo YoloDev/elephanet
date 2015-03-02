@@ -29,7 +29,7 @@ namespace Elephanet.Tests
             return dummyCars.ToList();
         }
 
-        [Fact]
+        [Fact(Skip="Uncomment for a speed test")]
         public void InsertSpeedTest()
         {
             var cars = GenerateCars(writeCount);
@@ -50,7 +50,7 @@ namespace Elephanet.Tests
             Console.WriteLine(string.Format("{0} writes in {1} seconds",writeCount, _watch.Elapsed.TotalSeconds));
         }
 
-        [Fact]
+        [Fact(Skip="Uncomment for a speed test")]
         public void LinqWhereQuerySpeedTest()
         {
             int seedNumber = 20000; //that should be enough to see if we are hitting the index nicely
