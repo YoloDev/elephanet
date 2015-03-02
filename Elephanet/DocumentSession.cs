@@ -114,7 +114,7 @@ namespace Elephanet
 
         void SaveInternal()
         {
-            //make sure all the entities have tables, if not, created them
+            //TODO:  implement upsert from http://stackoverflow.com/questions/17267417/how-do-i-do-an-upsert-merge-insert-on-duplicate-update-in-postgresql
 
             foreach (var item in _entities)
             {
@@ -130,6 +130,8 @@ namespace Elephanet
                     command.ExecuteNonQuery();
                 }
             }
+
+            _entities.Clear();
         }
 
         public void Store<T>(T entity)
