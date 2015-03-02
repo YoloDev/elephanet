@@ -77,6 +77,17 @@ public class Car
 		var audis = session.Query<Car>().Where(c => c.Make == "Audi").ToList();
 	}
 
+	//delete
+	using (var session = store.OpenSession())
+	{
+		session.Delete<Car>(myOldAudi.Id);
+	}
+
+	//delete all of a particular type
+	using (var session = store.OpenSession())
+	{
+		session.DeleteAll<Car>();
+	}
 	
 ```
 
@@ -91,7 +102,6 @@ public class Car
 ###Still to come###
 
 * Updates
-* Individual object Deletes
 * more linq provider support.  At this stage, only the Where equality check is done.
 * MORE TESTS!
 * More docs
