@@ -150,7 +150,7 @@ namespace Elephanet.Tests
 
 
         [Fact]
-        public void SessionCanQueryByStraightSqlString()
+        public void SessionCanDeleteById()
         {
 
             var dummyCars = new Fixture().Build<Car>()
@@ -165,7 +165,23 @@ namespace Elephanet.Tests
                 }
                 session.SaveChanges();
             }
+
+            using (var session = _store.OpenSession())
+            {
+                foreach (var car in dummyCars)
+                {
+                    session.Delete<Car>(car.Id);
+                    session.SaveChanges();
+                }
+            }
+
+            using (var session = _store.OpenSession())
+            {
+                var records = session.Query<Car>().Where(c => c.Make == "Subaru").ToList();
+                records.Count.ShouldBe(0);
+            }
         }
+
 
         public void Dispose()
         {

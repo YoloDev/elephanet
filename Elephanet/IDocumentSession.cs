@@ -6,7 +6,7 @@ namespace Elephanet
 {
     public interface IDocumentSession : IDisposable
     {
-        void Delete<T>(T entity);
+        void Delete<T>(Guid id);
         T Load<T>(Guid id);
         T[] Load<T>(params Guid[] ids);
         T[] Load<T>(IEnumerable<Guid> ids);
