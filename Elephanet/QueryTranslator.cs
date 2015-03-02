@@ -20,7 +20,8 @@ namespace Elephanet
 
         public string Translate(Expression expression)
         {
-            Visit(expression);
+            var inlined = ExpressionEvaluator.EvaluateSubtrees(expression);
+            Visit(inlined);
             return _sb.ToString();
         }
 

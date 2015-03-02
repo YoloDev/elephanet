@@ -27,9 +27,18 @@ namespace Elephanet.Tests
                .With(x => x.Make, "Subaru")
                .CreateMany();
 
+            var lowerCars = new Fixture().Build<Car>()
+                .With(x => x.Make, "SAAB")
+                .CreateMany();
+
             using (var session = _store.OpenSession())
             {
                 foreach (var car in dummyCars)
+                {
+                    session.Store<Car>(car);
+                }
+
+                foreach (var car in lowerCars)
                 {
                     session.Store<Car>(car);
                 }
@@ -60,6 +69,35 @@ namespace Elephanet.Tests
                 cars.ForEach(c => c.Make.ShouldBe("Subaru"));
               
             }
+        }
+
+        [Fact]
+        public void WhereExpression_Should_HandleExpressionSubtrees()
+        {
+            string make = "Subaru";
+            using (var session = _store.OpenSession())
+            {
+                var results = session.Query<Car>().Where(c => c.Make == make);
+                var cars = results.ToList();
+                cars.Count.ShouldBe(3);
+                cars.ShouldBeOfType<List<Car>>();
+                cars.ForEach(c => c.Make.ShouldBe("Subaru"));
+            }
+
+        }
+
+        [Fact]
+        public void WhereExpression_Should_HandleExtensionMethodsInSubtrees()
+        {
+            using (var session = _store.OpenSession())
+            {
+                var results = session.Query<Car>().Where(c => c.Make == "saab".ToUpper());
+                var cars = results.ToList();
+                cars.Count.ShouldBe(3);
+                cars.ShouldBeOfType<List<Car>>();
+                cars.ForEach(c => c.Make.ShouldBe("SAAB"));
+            }
+
         }
 
         public void Dispose()
