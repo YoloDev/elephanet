@@ -4,6 +4,7 @@ using Npgsql;
 using System.Linq;
 using System.Data;
 using Elephanet.Serialization;
+using System.Text;
 
 namespace Elephanet
 {
@@ -115,20 +116,20 @@ namespace Elephanet
         void SaveInternal()
         {
             //TODO:  implement upsert from http://stackoverflow.com/questions/17267417/how-do-i-do-an-upsert-merge-insert-on-duplicate-update-in-postgresql
+            StringBuilder sb = new StringBuilder();
 
             foreach (var item in _entities)
             {
                 GetOrCreateTable(item.Value.GetType());
+                sb.Append(string.Format("INSERT INTO {0} (id, body) VALUES ('{1}', '{2}');", _tableInfo.TableNameWithSchema(item.Value.GetType()),item.Key, _jsonConverter.Serialize(item.Value)));
+            }
 
-                using (var command = _conn.CreateCommand())
-                {
-                    command.CommandType = CommandType.Text;
-                    command.CommandText = String.Format(@"INSERT INTO {0} (id, body) VALUES (:id, :body);", _tableInfo.TableNameWithSchema(item.Value.GetType()));
-
-                    command.Parameters.AddWithValue(":id", item.Key);
-                    command.Parameters.AddWithValue(":body", _jsonConverter.Serialize(item.Value));
-                    command.ExecuteNonQuery();
-                }
+            using (var command = _conn.CreateCommand())
+            {
+                command.CommandTimeout = 60;
+                command.CommandType = CommandType.Text;
+                command.CommandText = sb.ToString();
+                command.ExecuteNonQuery();
             }
 
             _entities.Clear();
