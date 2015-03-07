@@ -71,6 +71,16 @@ public class Car
 		session.SaveChanges();
 	}
 
+	//update existing object
+	using (var session = store.OpenSession())
+	{
+		var audi = session.Load<Car>(myOldAudi.Id);
+		audi.Image_Url = "http://some_new_url";
+
+		session.Store<Car>(audi);
+		session.SaveChanges();
+	}
+
 	//query by make
 	using (var session = store.OpenSession())
 	{
@@ -94,14 +104,14 @@ public class Car
 ###Currently implemented###
 
 * You can load new documents to a unit of work cache (session.Store<T>());
-* You can save the unit of work cache to the database (session.SaveChanges());
+* You can save the unit of work cache to the database (session.SaveChanges()); Both inserts and updates are handled
 * You can retrieve individual documents from the database (session.Load<T>(your_id));
 * You can query via an objects property using the IQueryable linq provider (session.Query<Car>(c => c.Make == "Ford");
+* You can delete objects from the database (by guid Id)
 * You can implement your own custom json serialization (uses Jil by default), and it is easily overridable, there is an Json.Net one there as well
 
 ###Still to come###
 
-* Updates
 * more linq provider support.  At this stage, only the Where equality check is done.
 * MORE TESTS!
 * More docs
