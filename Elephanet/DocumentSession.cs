@@ -113,16 +113,53 @@ namespace Elephanet
             SaveInternal();
         }
 
+        HashSet<Tuple<Type, string,string>> MatchEntityToFinalTableAndTemporaryTable(Dictionary<Guid, object> entities)
+        {
+            HashSet<Tuple<Type, string, string>> typeToTableMap = new HashSet<Tuple<Type, string, string>>();
+
+            var types = entities.Values.Select(v => v.GetType()).Distinct();
+            foreach (Type type in types)
+            {
+                typeToTableMap.Add(new Tuple<Type, string, string> ( type, _tableInfo.TableNameWithSchema(type), Guid.NewGuid().ToString() ));
+            }
+
+            return typeToTableMap;
+        }
+
         void SaveInternal()
         {
             //TODO:  implement upsert from http://stackoverflow.com/questions/17267417/how-do-i-do-an-upsert-merge-insert-on-duplicate-update-in-postgresql
             StringBuilder sb = new StringBuilder();
 
+            HashSet<Tuple<Type, string,string>> matches = MatchEntityToFinalTableAndTemporaryTable(_entities);
+
+
             foreach (var item in _entities)
             {
+                //make sure we have tables for all types
                 GetOrCreateTable(item.Value.GetType());
-                sb.Append(string.Format("INSERT INTO {0} (id, body) VALUES ('{1}', '{2}');", _tableInfo.TableNameWithSchema(item.Value.GetType()),item.Key, _jsonConverter.Serialize(item.Value)));
             }
+
+            sb.Append("BEGIN;");
+            foreach (var match in matches)
+            {
+                sb.Append(string.Format("CREATE TEMPORARY TABLE \"{0}\" (id uuid, body jsonb);", match.Item3)); 
+            }
+
+            foreach (var item in _entities)
+            {
+                sb.Append(string.Format("INSERT INTO \"{0}\" (id, body) VALUES ('{1}', '{2}');", matches.Where(c => c.Item1 == item.Value.GetType()).Select(j => j.Item3).First(),item.Key, _jsonConverter.Serialize(item.Value)));
+            }
+
+            foreach (var match in matches)
+            {
+                sb.Append(string.Format("LOCK TABLE {0} IN EXCLUSIVE MODE;", match.Item2));
+                sb.Append(string.Format("UPDATE {0} SET body = tmp.body from \"{1}\" tmp where tmp.id = {0}.id;", match.Item2, match.Item3));
+                sb.Append(string.Format("INSERT INTO {0} SELECT tmp.id, tmp.body from \"{1}\" tmp LEFT OUTER JOIN {0} ON ({0}.id = tmp.id) where {0}.id IS NULL;", match.Item2, match.Item3));
+            }
+
+
+            sb.Append("COMMIT;");
 
             using (var command = _conn.CreateCommand())
             {

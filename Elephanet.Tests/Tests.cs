@@ -182,6 +182,77 @@ namespace Elephanet.Tests
             }
         }
 
+        [Fact]
+        public void SaveChangesWithUpdates_Should_Persist()
+        {
+
+            var dummyCar = new Fixture().Create<Car>();
+            var dummyBike = new Fixture().Create<Bike>();
+
+            using (var session = _store.OpenSession())
+            {
+                session.Store<Car>(dummyCar);
+                session.Store<Bike>(dummyBike);
+                session.SaveChanges();
+            }
+
+            using (var session = _store.OpenSession())
+            {
+                var retrievedBike = session.Load<Bike>(dummyBike.Id);
+                var retrievedCar = session.Load<Car>(dummyCar.Id);
+
+                retrievedBike.WheelSize = 900;
+                retrievedCar.Make = "Lada";
+                session.Store(retrievedCar);
+                session.Store(retrievedBike);
+                session.SaveChanges();
+            }
+
+            using (var session = _store.OpenSession())
+            {
+                var alteredBike = session.Load<Bike>(dummyBike.Id);
+                var alteredCar = session.Load<Car>(dummyCar.Id);
+
+                alteredBike.WheelSize.ShouldBe(900);
+                alteredCar.Make.ShouldBe("Lada");
+
+            }
+        }
+
+          [Fact]
+        public void SaveChangesWithUpdates_Should_BeQueryable()
+        {
+           var dummyCars = new Fixture().Build<Car>()
+          .With(x => x.Make, "Subaru")
+          .CreateMany(100).ToList();
+            using (var session = _store.OpenSession())
+            {
+                foreach (var car in dummyCars)
+                {
+                    session.Store(car);
+                    session.SaveChanges();
+                }
+
+            }
+
+              using (var session = _store.OpenSession())
+              {
+                  //retrieve a couple of cars
+                  var car1ToAlter = session.Load<Car>(dummyCars[15].Id);
+                  var car2ToAlter = session.Load<Car>(dummyCars[85].Id);
+                  car1ToAlter.Make = "Ford";
+                  car2ToAlter.Make = "Ford";
+                  session.Store(car1ToAlter);
+                  session.Store(car2ToAlter);
+                  session.SaveChanges();
+              }
+
+              using (var session = _store.OpenSession())
+              {
+                  var cars = session.Query<Car>().Where(c => c.Make == "Ford").ToList();
+                  cars.Count.ShouldBe(2);
+              }
+        }
 
         public void Dispose()
         {
