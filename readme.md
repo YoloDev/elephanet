@@ -6,8 +6,6 @@ This is VERY not ready for production.  I have NOT used it in production, so bew
 
 Heavily influenced by the RavenDb .NET client, this libary provides a simple api to allow easy use of postgres as a document store, taking advantage of Postgresql 9.4 and its new json indexing, allowing for fast querying of native json objects.
 
-At the moment, the implementation is limited, but is getting closer to something useable
-
 ```
 
 public class Car
