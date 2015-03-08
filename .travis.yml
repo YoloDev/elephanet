@@ -1,2 +1,9 @@
 language: csharp
 solution: Elephanet.sln
+addons:
+  postgresql: "9.4"
+
+before_script:
+  - psql -c "CREATE USER store_user with PASSWORD 'my super secret password';" -u postgres
+  - psql -c "CREATE DATABASE store;" -u postgres
+  - psql -c "GRANT ALL PRIVILEGES ON DATABASE store to store_user;"
