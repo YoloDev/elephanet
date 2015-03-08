@@ -8,3 +8,7 @@ before_script:
   - psql -c "CREATE USER store_user with PASSWORD 'my super secret password';" -U postgres
   - psql -c "CREATE DATABASE store;" -U postgres
   - psql -c "GRANT ALL PRIVILEGES ON DATABASE store to store_user;" -U postgres
+
+script:
+  - xbuild /p:Configuration=Release Elephanet.sln 
+  - mono ./packages/xunit.runners.1.9.2/tools/xunit.console.exe  ./Elephanet.Tests/bin/Release/Elephanet.Tests.dll
