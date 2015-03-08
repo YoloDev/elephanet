@@ -5,6 +5,7 @@ addons:
 
 before_script:
   - psql -V
+  - psql -c "CREATE EXTENSION ""uuid-ossp"";" -U postgres
   - psql -c "CREATE USER store_user with PASSWORD 'my super secret password';" -U postgres
   - psql -c "CREATE DATABASE store;" -U postgres
   - psql -c "GRANT ALL PRIVILEGES ON DATABASE store to store_user;" -U postgres
