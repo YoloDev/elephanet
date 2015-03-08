@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/YoloDev/elephanet.svg?branch=master)](https://travis-ci.org/YoloDev/elephanet) 
 ##Elephanet - A .NET api to PostgreSQL's json.##
 
 ###With an api thats easy to use###
