@@ -11,3 +11,6 @@ before_script:
 script:
   - xbuild /p:Configuration=Release Elephanet.sln 
   - mono ./packages/xunit.runners.1.9.2/tools/xunit.console.clr4.exe  ./Elephanet.Tests/bin/Release/Elephanet.Tests.dll
+  - ./Elephanet/nuget.exe pack Elephanet.csproj -IncludeReferencedProjects -Prop Configuration=Release
+  - ./Elephanet/nuget.exe setApiKey NUGET_API_KEY
+  - ./Elephanet/nuget.exe push ./Elephanet/*.nupkg
