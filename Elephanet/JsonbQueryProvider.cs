@@ -38,7 +38,6 @@ namespace Elephanet
         public object Execute(Expression expression)
         {
             string sql = _translator.Translate(expression);
-            Console.WriteLine(sql);
             using (var command = new NpgsqlCommand(sql,_conn))
             {
                 Type elementType = TypeSystem.GetElementType(expression.Type);
