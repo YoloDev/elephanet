@@ -13,6 +13,6 @@
     <tags>postgresql jsonb npgsql</tags>
   </metadata>
   <files> 
-    <file src="\bin\Release\Elephanet.dll" target="lib\net40\"/>
+    <file src="bin\Release\Elephanet.dll" target="lib\net40\"/>
   </files>
 </package>
