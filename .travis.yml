@@ -1,4 +1,5 @@
 language: csharp
+env: VERSION=0.1.2
 solution: Elephanet.sln
 addons:
   postgresql: "9.4"
@@ -11,5 +12,5 @@ before_script:
 script:
   - xbuild /p:Configuration=Release Elephanet.sln 
   - mono ./packages/xunit.runners.1.9.2/tools/xunit.console.clr4.exe  ./Elephanet.Tests/bin/Release/Elephanet.Tests.dll
-  - nuget setApiKey NUGET_API_KEY
-  - cd Elephanet && nuget pack Elephanet.csproj -IncludeReferencedProjects -Prop Configuration=Release && nuget push *.nupkg
+  - nuget setApiKey $NUGET_API_KEY
+  - cd Elephanet && nuget pack Elephanet.nuspec -Version $VERSION -IncludeReferencedProjects -Prop Configuration=Release && nuget push *.nupkg
