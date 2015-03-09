@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
+    <id>Elephanet</id>
     <version>$version$</version>
-    <title>$title$</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
+    <title>Elephanet</title>
+    <authors>James Kelly</authors>
+    <owners>James Kelly</owners>
     <licenseUrl>https://github.com/YoloDev/elephanet/blob/master/LICENCE</licenseUrl>
     <projectUrl>https://github.com/YoloDev/elephanet</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>$description$</description>
+    <description>A .NET api for PostgreSQLs jsonb that is easy to use</description>
     <tags>postgresql jsonb npgsql</tags>
   </metadata>
   <files> 
-    <file src="\bin\$configuration$\Elephanet.dll" target="lib\net40\"/>
+    <file src="\bin\Release\Elephanet.dll" target="lib\net40\"/>
   </files>
 </package>
