@@ -219,7 +219,7 @@ namespace Elephanet
                         command.CommandText = String.Format(@"
                             CREATE TABLE IF NOT EXISTS {0}
                             (
-                                id uuid NOT NULL DEFAULT uuid_generate_v1(), 
+                                id uuid NOT NULL, 
                                 body jsonb NOT NULL, 
                                 created time without time zone NOT NULL DEFAULT now(), 
                                 row_version integer NOT NULL DEFAULT 1, 
