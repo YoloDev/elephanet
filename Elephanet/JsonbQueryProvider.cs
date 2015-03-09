@@ -78,7 +78,6 @@ namespace Elephanet
 
         IQueryable IQueryProvider.CreateQuery(Expression expression)
         {
-            Console.WriteLine("Calling Create Query"); 
             Type elementType = TypeSystem.GetElementType(expression.Type);
             try
             {
