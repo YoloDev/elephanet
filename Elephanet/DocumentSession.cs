@@ -128,7 +128,6 @@ namespace Elephanet
 
         void SaveInternal()
         {
-            //TODO:  implement upsert from http://stackoverflow.com/questions/17267417/how-do-i-do-an-upsert-merge-insert-on-duplicate-update-in-postgresql
             StringBuilder sb = new StringBuilder();
 
             HashSet<Tuple<Type, string,string>> matches = MatchEntityToFinalTableAndTemporaryTable(_entities);
