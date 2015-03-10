@@ -13,5 +13,5 @@ script:
   - xbuild /p:Configuration=Release Elephanet.sln 
   - mono ./packages/xunit.runners.1.9.2/tools/xunit.console.clr4.exe  ./Elephanet.Tests/bin/Release/Elephanet.Tests.dll
   - chmod 755 ./packages/ILRepack.1.25.0/tools/ILRepack.exe
-  - ./packages/ILRepack.1.25.0/tools/ILRepack.exe Elephanet/bin/Release/Elephanet.dll Elephanet/bin/Release/Sigil.dll Elephanet/bin/Release/Jil.dll Elephanet/bin/Release/Mono.Security.dll Elephanet/bin/Release/Npgsql.dll --internalize --out:Elephanet/Elephanet.dll
+  - ./packages/ILRepack.1.25.0/tools/ILRepack.exe Elephanet/bin/Release/Elephanet.dll Elephanet/bin/Release/Sigil.dll Elephanet/bin/Release/Jil.dll Elephanet/bin/Release/Mono.Security.dll Elephanet/bin/Release/Npgsql.dll --internalize --out:Elephanet/Elephanet-$VERSION.dll
   - cd Elephanet && nuget pack Elephanet.nuspec -Version $VERSION -IncludeReferencedProjects -Prop Configuration=Release && nuget push *.nupkg $NUGET_API_KEY
