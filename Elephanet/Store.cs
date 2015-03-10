@@ -71,7 +71,6 @@ namespace Elephanet
                     {
                         command.CommandType = CommandType.Text;
                         command.CommandText = String.Format(@"drop table {0};", tablename);
-                        Console.WriteLine(command.CommandText);
                         command.ExecuteNonQuery();
                     }
                   }
@@ -100,7 +99,6 @@ namespace Elephanet
                     {
                         command.CommandType = CommandType.Text;
                         command.CommandText = String.Format(@"delete from {0};", tablename);
-                        Console.WriteLine(command.CommandText);
                         command.ExecuteNonQuery();
                     }
                   }
