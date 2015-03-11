@@ -1,5 +1,5 @@
 language: csharp
-env: VERSION=0.1.4
+env: VERSION=0.1.5
 solution: Elephanet.sln
 addons:
   postgresql: "9.4"
