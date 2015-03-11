@@ -87,7 +87,7 @@ namespace Elephanet.Tests
             using (var session = _store.OpenSession())
             {
                 session.Store<Car>(dummyCar);
-                var result = session.Load<Car>(dummyCar.Id);
+                var result = session.GetById<Car>(dummyCar.Id);
                 result.Id.ShouldBe(dummyCar.Id);
                 result.Make.ShouldBe(dummyCar.Make);
                 result.Model.ShouldBe(dummyCar.Model);
@@ -118,7 +118,7 @@ namespace Elephanet.Tests
 
             using (var session = _store.OpenSession())
             {
-                var car = session.Load<Car>(dummyCar.Id);
+                var car = session.GetById<Car>(dummyCar.Id);
                 car.Id.ShouldBe(dummyCar.Id);
                 car.Make.ShouldBe(dummyCar.Make);
                 car.Model.ShouldBe(dummyCar.Model);
@@ -143,8 +143,8 @@ namespace Elephanet.Tests
 
             using (var session = _store.OpenSession())
             {
-                session.Load<Bike>(dummyBike.Id).ShouldNotBe(null);
-                session.Load<Car>(dummyCar.Id).ShouldNotBe(null);
+                session.GetById<Bike>(dummyBike.Id).ShouldNotBe(null);
+                session.GetById<Car>(dummyCar.Id).ShouldNotBe(null);
             }
         }
 
@@ -198,8 +198,8 @@ namespace Elephanet.Tests
 
             using (var session = _store.OpenSession())
             {
-                var retrievedBike = session.Load<Bike>(dummyBike.Id);
-                var retrievedCar = session.Load<Car>(dummyCar.Id);
+                var retrievedBike = session.GetById<Bike>(dummyBike.Id);
+                var retrievedCar = session.GetById<Car>(dummyCar.Id);
 
                 retrievedBike.WheelSize = 900;
                 retrievedCar.Make = "Lada";
@@ -210,8 +210,8 @@ namespace Elephanet.Tests
 
             using (var session = _store.OpenSession())
             {
-                var alteredBike = session.Load<Bike>(dummyBike.Id);
-                var alteredCar = session.Load<Car>(dummyCar.Id);
+                var alteredBike = session.GetById<Bike>(dummyBike.Id);
+                var alteredCar = session.GetById<Car>(dummyCar.Id);
 
                 alteredBike.WheelSize.ShouldBe(900);
                 alteredCar.Make.ShouldBe("Lada");
@@ -238,8 +238,8 @@ namespace Elephanet.Tests
               using (var session = _store.OpenSession())
               {
                   //retrieve a couple of cars
-                  var car1ToAlter = session.Load<Car>(dummyCars[15].Id);
-                  var car2ToAlter = session.Load<Car>(dummyCars[85].Id);
+                  var car1ToAlter = session.GetById<Car>(dummyCars[15].Id);
+                  var car2ToAlter = session.GetById<Car>(dummyCars[85].Id);
                   car1ToAlter.Make = "Ford";
                   car2ToAlter.Make = "Ford";
                   session.Store(car1ToAlter);

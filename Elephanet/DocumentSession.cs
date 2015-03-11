@@ -50,25 +50,6 @@ namespace Elephanet
 
         }
 
-        public T Load<T>(Guid id)
-        {
-         
-            GetOrCreateTable(typeof(T));
-
-            //hit the db first, so we get most up-to-date
-            var entity = LoadInternal<T>(id);
-            //try the cache just incase hasn't been saved to db yet, but is in session
-            if ((entity == null) && _entities.ContainsKey(id))
-                entity = (T)_entities[id];
-
-            if (entity == null)
-            {
-                throw new NullReferenceException(string.Format("Entity id {0} does not exist.", id));
-            }
-            return entity;
-
-        }
-
         public T LoadInternal<T>(Guid id) 
         {
 
@@ -89,16 +70,6 @@ namespace Elephanet
                         return default(T);
                     }
                 }
-        }
-
-        public T[] Load<T>(params Guid[] ids)
-        {
-            throw new NotImplementedException();
-        }
-
-        public T[] Load<T>(IEnumerable<Guid> ids)
-        {
-            throw new NotImplementedException();
         }
 
         public IJsonbQueryable<T> Query<T>()
@@ -246,6 +217,78 @@ namespace Elephanet
         public void Dispose()
         {
             _conn.Close();
+        }
+
+
+        public void Delete<T>(T entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public T GetById<T>(Guid id)
+        {
+            GetOrCreateTable(typeof(T));
+            //hit the db first, so we get most up-to-date
+            var entity = LoadInternal<T>(id);
+            //try the cache just incase hasn't been saved to db yet, but is in session
+            if ((entity == null) && _entities.ContainsKey(id))
+                entity = (T)_entities[id];
+
+            if (entity == null)
+            {
+                throw new NullReferenceException(string.Format("Entity id {0} does not exist.", id));
+            }
+            return entity;
+        }
+
+        public IEnumerable<T> GetByIds<T>(IEnumerable<Guid> ids)
+        {
+
+                 using (var command = _conn.CreateCommand())
+                {
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = String.Format(@"SELECT body FROM {0} WHERE id in ({1});", _tableInfo.TableNameWithSchema(typeof(T)), JoinAndCommaSeperateAndSurroundWithSingleQuotes(ids));
+                    Console.WriteLine(command.CommandText);
+
+                    List<T> entities = new List<T>();
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            T entity = _jsonConverter.Deserialize<T>(reader.GetString(0));
+                            entities.Add(entity);
+                        }
+                    }
+                    return entities;
+                }
+        }
+
+        private string JoinAndCommaSeperateAndSurroundWithSingleQuotes<T>(IEnumerable<T> ids)
+        {
+            return string.Join(",",ids.Select(n => n.ToString().SurroundWithSingleQuote()).ToArray());
+        }
+
+        public IEnumerable<T> GetAll<T>()
+        {
+            using (var command = _conn.CreateCommand())
+            {
+                command.CommandType = CommandType.Text;
+                command.CommandText = String.Format(@"SELECT body FROM {0};", _tableInfo.TableNameWithSchema(typeof(T)));
+                Console.WriteLine(command.CommandText);
+
+                List<T> entities = new List<T>();
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        T entity = _jsonConverter.Deserialize<T>(reader.GetString(0));
+                        entities.Add(entity);
+                    }
+                }
+                return entities;
+            }
         }
     }
 }
