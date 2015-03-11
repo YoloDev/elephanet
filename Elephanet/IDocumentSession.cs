@@ -7,12 +7,13 @@ namespace Elephanet
     public interface IDocumentSession : IDisposable
     {
         void Delete<T>(Guid id);
-        T Load<T>(Guid id);
-        T[] Load<T>(params Guid[] ids);
-        T[] Load<T>(IEnumerable<Guid> ids);
+        void Delete<T>(T entity);
+        T GetById<T>(Guid id);
+        IEnumerable<T> GetByIds<T>(IEnumerable<Guid> ids);
+        IEnumerable<T> GetAll<T>();
         IJsonbQueryable<T> Query<T>();
         void SaveChanges();
         void Store<T>(T entity);
-        void DeleteAll<T1>();
+        void DeleteAll<T>();
     }
 }

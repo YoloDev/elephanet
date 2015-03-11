@@ -56,6 +56,7 @@
     <Compile Include="Bike.cs" />
     <Compile Include="Car.cs" />
     <Compile Include="DirtySpeedTests.cs" />
+    <Compile Include="GetByIdTests.cs" />
     <Compile Include="LinqTests.cs" />
     <Compile Include="StoreInfoTests.cs" />
     <Compile Include="TableInfoTests.cs" />

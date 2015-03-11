@@ -61,7 +61,6 @@ namespace Elephanet
                 _command.Parameters.Add(new NpgsqlParameter(entry.Key,entry.Value));
                 // do something with entry.Value or entry.Key
             }
-            Console.WriteLine(_command.CommandText);
         }
 
         private Dictionary<string, object> MatchParameters(string query, object[] parameters)

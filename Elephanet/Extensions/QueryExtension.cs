@@ -16,5 +16,15 @@ namespace Elephanet
             text = text.Replace(".", "_");
             return text;
         }
+
+        public static string SurroundWith(this string text, string ends)
+        {
+            return ends + text + ends;
+        }
+
+        public static string SurroundWithSingleQuote(this string text)
+        {
+            return SurroundWith(text, "'");
+        }
     }
 }
