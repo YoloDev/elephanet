@@ -56,12 +56,14 @@
     <Compile Include="Bike.cs" />
     <Compile Include="Car.cs" />
     <Compile Include="DirtySpeedTests.cs" />
+    <Compile Include="GetAllTests.cs" />
     <Compile Include="GetByIdTests.cs" />
     <Compile Include="LinqTests.cs" />
     <Compile Include="StoreInfoTests.cs" />
     <Compile Include="TableInfoTests.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestStore.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
