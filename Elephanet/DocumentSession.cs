@@ -30,29 +30,32 @@ namespace Elephanet
 
         public void Delete<T>(Guid Id)
         {
+            GetOrCreateTable(typeof(T));
             using (var command = _conn.CreateCommand())
             {
                 command.CommandType = CommandType.Text;
                 command.CommandText = String.Format(@"Delete FROM {0} WHERE id = :id;", _tableInfo.TableNameWithSchema(typeof(T)));
-                command.Parameters.AddWithValue(":id", Id);;
+                command.Parameters.AddWithValue(":id", Id);
                 command.ExecuteNonQuery();
             }
         }
 
         public void DeleteAll<T>()
         {
-                using (var command = _conn.CreateCommand())
-                {
-                    command.CommandType = CommandType.Text;
-                    command.CommandText = String.Format(@"DELETE FROM {0};", _tableInfo.TableNameWithSchema(typeof(T)));
-                    command.ExecuteNonQuery();
-                }
+            GetOrCreateTable(typeof(T));
+            using (var command = _conn.CreateCommand())
+            {
+                command.CommandType = CommandType.Text;
+                command.CommandText = String.Format(@"DELETE FROM {0};", _tableInfo.TableNameWithSchema(typeof(T)));
+                command.ExecuteNonQuery();
+            }
 
         }
 
         public T LoadInternal<T>(Guid id) 
         {
 
+            GetOrCreateTable(typeof(T));
                 using (var command = _conn.CreateCommand())
                 {
                     command.CommandType = CommandType.Text;
@@ -244,6 +247,7 @@ namespace Elephanet
         public IEnumerable<T> GetByIds<T>(IEnumerable<Guid> ids)
         {
 
+            GetOrCreateTable(typeof(T));
                  using (var command = _conn.CreateCommand())
                 {
                     command.CommandType = CommandType.Text;
@@ -271,6 +275,7 @@ namespace Elephanet
 
         public IEnumerable<T> GetAll<T>()
         {
+            GetOrCreateTable(typeof(T));
             using (var command = _conn.CreateCommand())
             {
                 command.CommandType = CommandType.Text;
