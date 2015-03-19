@@ -15,7 +15,7 @@ namespace Elephanet.Tests
         public  Tests()
         {
             _testStore = new StoreInfo();
-            _store = new DocumentStore("Server=127.0.0.1;Port=5432;User id=store_user;password=my super secret password;database=store;");
+            _store = new TestStore(); 
         }
             
         [Fact]
