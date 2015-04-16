@@ -5,6 +5,7 @@ using System.Linq;
 using System.Data;
 using Elephanet.Serialization;
 using System.Text;
+using Elephanet.Helpers;
 
 namespace Elephanet
 {
@@ -121,7 +122,7 @@ namespace Elephanet
 
             foreach (var item in _entities)
             {
-                sb.Append(string.Format("INSERT INTO \"{0}\" (id, body) VALUES ('{1}', '{2}');", matches.Where(c => c.Item1 == item.Value.GetType()).Select(j => j.Item3).First(),item.Key, _jsonConverter.Serialize(item.Value)));
+                sb.Append(string.Format("INSERT INTO \"{0}\" (id, body) VALUES ('{1}', '{2}');", matches.Where(c => c.Item1 == item.Value.GetType()).Select(j => j.Item3).First(),item.Key, _jsonConverter.Serialize(item.Value).EscapeQuotes()));
             }
 
             foreach (var match in matches)
@@ -295,5 +296,7 @@ namespace Elephanet
                 return entities;
             }
         }
+
+
     }
 }
