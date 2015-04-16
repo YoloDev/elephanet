@@ -78,6 +78,7 @@
     <Compile Include="StoreConventions.cs" />
     <Compile Include="Expressions\JsonbExpressionVisitor.cs" />
     <Compile Include="StoreInfo.cs" />
+    <Compile Include="StringHelpers.cs" />
     <Compile Include="TableInfo.cs" />
     <Compile Include="TypeHelper.cs" />
   </ItemGroup>
