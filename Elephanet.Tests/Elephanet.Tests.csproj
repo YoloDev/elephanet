@@ -59,6 +59,7 @@
     <Compile Include="GetAllTests.cs" />
     <Compile Include="GetByIdTests.cs" />
     <Compile Include="LinqTests.cs" />
+    <Compile Include="QueryTests.cs" />
     <Compile Include="StoreInfoTests.cs" />
     <Compile Include="TableInfoTests.cs" />
     <Compile Include="Tests.cs" />
