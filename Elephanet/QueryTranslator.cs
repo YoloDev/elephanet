@@ -7,14 +7,23 @@ using System.Text;
 
 namespace Elephanet
 {
+
+        
      public class QueryTranslator : ExpressionVisitor
     {
         const string columnName = "body";
         private StringBuilder _sb;
         private TableInfo _tableInfo;
+
+        private Expression _where;
+        private StringBuilder _limit;
+        private StringBuilder _offset;
+
         public QueryTranslator(TableInfo tableInfo)
         {
             _sb = new StringBuilder();
+            _limit = new StringBuilder();
+            _offset = new StringBuilder();
             _tableInfo = tableInfo;
         }
 
@@ -22,6 +31,9 @@ namespace Elephanet
         {
             var inlined = ExpressionEvaluator.EvaluateSubtrees(expression);
             Visit(inlined);
+
+            _sb.Append(_limit);
+            _sb.Append(_offset);
             return _sb.ToString();
         }
 
@@ -36,14 +48,37 @@ namespace Elephanet
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            if (node.Method.DeclaringType == typeof(Queryable) && node.Method.Name == "Where")
+            if (node.Method.DeclaringType == typeof(Queryable))
             {
-                Type elementType = TypeSystem.GetElementType(node.Type);
-                _sb.Append(string.Format("select {0} from {1} where {0} ", columnName, _tableInfo.TableNameWithSchema(elementType)));
-                //Visit(node.Arguments[0]);
-                LambdaExpression lambda = (LambdaExpression)StripQuotes(node.Arguments[1]);
-                Visit(lambda.Body);
-                return node;
+                switch (node.Method.Name)
+                {
+                    case "Where":
+                    {
+                        Type elementType = TypeSystem.GetElementType(node.Type);
+                        _sb.Append(string.Format("select {0} from {1} where {0} ", columnName, _tableInfo.TableNameWithSchema(elementType)));
+                        //Visit(node.Arguments[0]);
+                        LambdaExpression lambda = (LambdaExpression)StripQuotes(node.Arguments[1]);
+                        Visit(lambda.Body);
+                        return node;
+                    }
+                    case "Take":
+                    {
+                        _limit.Append(" limit ");
+                        VisitLimit((ConstantExpression)node.Arguments[1]);
+                        VisitMethodCall((MethodCallExpression)node.Arguments[0]);
+                        return node;
+                    }
+                    case "Skip":
+                    {
+                        _offset.Append(" offset ");
+                        VisitOffset((ConstantExpression)node.Arguments[1]);
+                        VisitMethodCall((MethodCallExpression)node.Arguments[0]);
+                        return node;
+
+                    }
+                       
+
+                }
             }
             throw new NotSupportedException(string.Format("The method '{0}' is not supported", node.Method.Name));
          }
@@ -73,6 +108,20 @@ namespace Elephanet
             return node;
         }
 
+         private Expression VisitLimit(ConstantExpression node)
+        {
+            _limit.Append(string.Format("{0}",node.Value));
+            return node;
+        }
+
+         private Expression VisitOffset(ConstantExpression node)
+         {
+             _offset.Append(string.Format("{0}", node.Value));
+             return node;
+         }
+
+
+
         protected override Expression VisitMember(MemberExpression node)
         {
             if (node.Expression != null && node.Expression.NodeType == ExpressionType.Parameter)
@@ -80,6 +129,8 @@ namespace Elephanet
                 _sb.Append(string.Format("\"{0}\"", node.Member.Name));
                 return node;
             }
+
+          
 
             throw new NotSupportedException(string.Format("The member '{0}' is not supported", node.Member.Name));
         }

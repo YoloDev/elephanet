@@ -100,6 +100,31 @@ namespace Elephanet.Tests
 
         }
 
+        [Fact]
+        public void IQueryable_Should_ImplementTakeMethod()
+        {
+            using (var session = _store.OpenSession())
+            {
+                var results = session.Query<Car>().Where(c => c.Make == "SAAB").Take(2);
+                var cars = results.ToList();
+                cars.Count.ShouldBe(2);
+                cars.ShouldBeOfType<List<Car>>();
+            }
+        }
+
+        [Fact]
+        public void IQueryable_Should_ImplementSkipMethod()
+        {
+            using (var session = _store.OpenSession())
+            {
+                var results = session.Query<Car>().Where(c => c.Make == "SAAB").Take(1).Skip(2);
+                var cars = results.ToList();
+                cars.Count.ShouldBe(1);
+                cars.ShouldBeOfType<List<Car>>();
+            }
+
+        }
+
         public void Dispose()
         {
             using (var session = _store.OpenSession())
