@@ -18,12 +18,14 @@ namespace Elephanet
         private Expression _where;
         private StringBuilder _limit;
         private StringBuilder _offset;
+        private StringBuilder _orderBy;
 
         public QueryTranslator(TableInfo tableInfo)
         {
             _sb = new StringBuilder();
             _limit = new StringBuilder();
             _offset = new StringBuilder();
+            _orderBy = new StringBuilder();
             _tableInfo = tableInfo;
         }
 
@@ -32,8 +34,11 @@ namespace Elephanet
             var inlined = ExpressionEvaluator.EvaluateSubtrees(expression);
             Visit(inlined);
 
+            _sb.Append(_orderBy);
             _sb.Append(_limit);
             _sb.Append(_offset);
+            _sb.Append(";");
+            Console.WriteLine(_sb.ToString());
             return _sb.ToString();
         }
 
@@ -76,6 +81,14 @@ namespace Elephanet
                         return node;
 
                     }
+                    case "OrderBy":
+                    {
+                        Type elementType = TypeSystem.GetElementType(node.Type);
+                        LambdaExpression lambda = (LambdaExpression)StripQuotes(node.Arguments[1]);
+                        VisitOrderBy((MemberExpression)lambda.Body);
+                        VisitMethodCall((MethodCallExpression)node.Arguments[0]);
+                        return node;
+                    }
                        
 
                 }
@@ -114,13 +127,24 @@ namespace Elephanet
             return node;
         }
 
+
          private Expression VisitOffset(ConstantExpression node)
          {
              _offset.Append(string.Format("{0}", node.Value));
              return node;
          }
 
+         private Expression VisitOrderBy(MemberExpression node)
+         {
+            if (node.Expression != null && node.Expression.NodeType == ExpressionType.Parameter)
+            {
+                _orderBy.Append(string.Format(" order by body->>'{0}'", node.Member.Name));
+                return node;
+            }
 
+            throw new NotSupportedException(string.Format("The member '{0}' is not supported", node.Member.Name));
+
+         }
 
         protected override Expression VisitMember(MemberExpression node)
         {
