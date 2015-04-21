@@ -117,7 +117,7 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var results = session.Query<Car>().Where(c => c.Make == "SAAB").Take(1).Skip(2);
+                var results = session.Query<Car>().Where(c => c.Make == "SAAB").Skip(2);
                 var cars = results.ToList();
                 cars.Count.ShouldBe(1);
                 cars.ShouldBeOfType<List<Car>>();
