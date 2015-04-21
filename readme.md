@@ -3,11 +3,12 @@
 
 ###With an api thats easy to use###
 
-This is VERY not ready for production.  I have NOT used it in production, so beware.
+A document db backed by Postgresql.
 
-Heavily influenced by the RavenDb .NET client, this libary provides a simple api to allow easy use of postgres as a document store, taking advantage of Postgresql 9.4 and its new json indexing, allowing for fast querying of native json objects.
+Heavily influenced by the RavenDb .NET client, this libary provides a simple api to allow easy use of postgres as a document store, taking advantage of Postgresql 9.4 and its new jsonb indexing, allowing for fast querying of native json objects.
 
 ```
+using System;
 
 public class Car
 {
@@ -17,7 +18,9 @@ public class Car
 	public string ImageUrl {get;set;}
 	public string NumberPlate {get;set;}
 }
+```
 
+```
 	//create the datastore
 	DocumentStore store = new DocumentStore("Server=127.0.0.1;Port=5432;User Id=store_user;password=my super secret password;database=store;");
 	
@@ -41,7 +44,7 @@ public class Car
 	//get the same car back out of the document store
 	using (var session = store.OpenSession())
 	{
-		var car = session.Load<Car>(myAudi.Id);
+		var car = session.GetById<Car>(myAudi.Id);
 	}
 
 
@@ -73,7 +76,7 @@ public class Car
 	//update existing object
 	using (var session = store.OpenSession())
 	{
-		var audi = session.Load<Car>(myOldAudi.Id);
+		var audi = session.GetById<Car>(myOldAudi.Id);
 		audi.Image_Url = "http://some_new_url";
 
 		session.Store<Car>(audi);
@@ -102,15 +105,17 @@ public class Car
 
 ###Currently implemented###
 
-* You can load new documents to a unit of work cache (session.Store<T>());
-* You can save the unit of work cache to the database (session.SaveChanges()); Both inserts and updates are handled
-* You can retrieve individual documents from the database (session.Load<T>(your_id));
-* You can query via an objects property using the IQueryable linq provider (session.Query<Car>(c => c.Make == "Ford");
-* You can delete objects from the database (by guid Id)
-* You can implement your own custom json serialization (uses Jil by default), and it is easily overridable, there is an Json.Net one there as well
+* You can ```session.Store<T>(T entity)```
+* You can ```session.SaveChanges();```
+* You can ```session.GetById<T>(Guid id)```
+* You can ```session.GetByIds<T>(IEnumerable<Guid> ids)```
+* You can ```session.Delete<T>(Guid id)```
+* You can ```session.GetAll<T>();```
+* You can ```session.DeleteAll<T>();```
+* You can ```session.Query<T>(x => x.SomeAttribute == "some value").ToList();```
+* You can ```session.Query<T>(x => x.SomeAttribute == "some value").Take(10).Skip(5);```
 
-###Still to come###
+###Things of note:
 
-* more linq provider support.  At this stage, only the Where equality check is done.
-* MORE TESTS!
-* More docs
+* You can implement your own custom json serialization (Jil is internalised by default)
+* Store<T>() is a unit of work stored in memory.  SaveChanges() flushes the in memory values to the database
