@@ -58,6 +58,7 @@
     <Compile Include="DirtySpeedTests.cs" />
     <Compile Include="GetAllTests.cs" />
     <Compile Include="GetByIdTests.cs" />
+    <Compile Include="LinqOrderByTests.cs" />
     <Compile Include="LinqTests.cs" />
     <Compile Include="QueryTests.cs" />
     <Compile Include="StoreInfoTests.cs" />
