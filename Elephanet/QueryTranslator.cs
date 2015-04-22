@@ -89,12 +89,32 @@ namespace Elephanet
                         VisitMethodCall((MethodCallExpression)node.Arguments[0]);
                         return node;
                     }
+                    case "OrderByDescending":
+                        {
+                            Type elementType = TypeSystem.GetElementType(node.Type);
+                            LambdaExpression lambda = (LambdaExpression)StripQuotes(node.Arguments[1]);
+                            VisitOrderByDesc((MemberExpression)lambda.Body);
+                            VisitMethodCall((MethodCallExpression)node.Arguments[0]);
+                            return node;
+
+                        }
                        
 
                 }
             }
             throw new NotSupportedException(string.Format("The method '{0}' is not supported", node.Method.Name));
          }
+
+        private Expression VisitOrderByDesc(MemberExpression node)
+        {
+            if (node.Expression != null && node.Expression.NodeType == ExpressionType.Parameter)
+            {
+                _orderBy.Append(string.Format(" order by body->>'{0}' desc", node.Member.Name));
+                return node;
+            }
+
+            throw new NotSupportedException(string.Format("The member '{0}' is not supported from the OrderByDescending operator", node.Member.Name));
+        }
 
         protected override Expression VisitBinary(BinaryExpression node)
         {

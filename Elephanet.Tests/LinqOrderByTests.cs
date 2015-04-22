@@ -46,6 +46,17 @@ namespace Elephanet.Tests
             }
         }
 
+        [Fact]
+        public void IQueryable_Should_ImplementOrderByDescending()
+        {
+            using (var session = _store.OpenSession())
+            {
+                var cars = session.Query<Car>().Where(c => c.Make == "Mazda").OrderByDescending(o => o.Model).ToList();
+                cars[0].Model.ShouldBe("B");
+                cars[1].Model.ShouldBe("A");
+            }
+        }
+
         public void Dispose()
         {
             using (var session = _store.OpenSession())
