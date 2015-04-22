@@ -114,6 +114,8 @@ public class Car
 * You can ```session.DeleteAll<T>();```
 * You can ```session.Query<T>(x => x.SomeAttribute == "some value").ToList();```
 * You can ```session.Query<T>(x => x.SomeAttribute == "some value").Take(10).Skip(5);```
+* You can ```session.Query<T>(x => x.SomeAttribute == "some value").OrderBy(c => c.SomeOtherAttibute);```
+* You can ```session.Query<T>(x => x.SomeAttribute == "some value").OrderByDescending(c => c.SomeOtherAttibute);```
 
 ###Things of note:
 
