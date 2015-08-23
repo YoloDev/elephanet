@@ -7,6 +7,23 @@ using Elephanet.Serialization;
 using System.Text;
 using Elephanet.Helpers;
 
+
+/*
+ *implement fts on all string columns with a query like the following...
+ * 
+ * select body from elephanet_demo_toilet
+where lower(cast(body as text)) like '%sandy%point%victoria%'
+and similarity(lower(cast(body as text)), '%sandy%point%victoria%') > 0
+order by similarity(lower(cast(body as text)), '%sandy%point%victoria%') desc
+limit 20;
+ * 
+ * 
+ * needs an index like
+ * 
+ * CREATE INDEX toilet_search_idx ON elephanet_demo_toilet USING gin (lower(cast(body as text))  gin_trgm_ops)
+drop index toilet_search_idx;
+ */
+
 namespace Elephanet
 {
     public class DocumentSession : IDocumentSession
