@@ -1,9 +1,9 @@
 [![Build Status](https://travis-ci.org/YoloDev/elephanet.svg?branch=master)](https://travis-ci.org/YoloDev/elephanet) 
-##Elephanet - A .NET api to PostgreSQL's json.##
+##Elephanet - A .NET document database built on PostgreSQL.##
 
 ###With an api thats easy to use###
 
-A document db backed by Postgresql.
+A document db api backed by Postgresql.
 
 Heavily influenced by the RavenDb .NET client, this libary provides a simple api to allow easy use of postgres as a document store, taking advantage of Postgresql 9.4 and its new jsonb indexing, allowing for fast querying of native json objects.
 
