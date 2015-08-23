@@ -7,6 +7,26 @@ A document db api backed by Postgresql.
 
 Heavily influenced by the RavenDb .NET client, this libary provides a simple api to allow easy use of postgres as a document store, taking advantage of Postgresql 9.4 and its new jsonb indexing, allowing for fast querying of native json objects.
 
+###Quick Start
+
+For Windows
+
+1.  Install Postgresql > 9.4 (available at http://www.postgresql.org/download/windows/). When you do so, pay particular attention to your postgres user password (you will need this in the next step)
+2.  Clone (or fork) this repository
+3.  Alter create_store.sql file and replace "my super secret password" with your own password
+4.  Run create_store.bat from within a cmd prompt.
+
+For Ubuntu (and likely other Debian based distros)
+
+1.  Install Postgresql via apt-get.  Make sure it is greater than version 9.4
+2.  Install Mono (http://www.mono-project.com/docs/getting-started/install/linux/)
+3.  Clone (or fork) this repository
+4.  Alter create_store.sql file and replace "my super secret password" with your own password
+5.  run `psql -f create_store.sql -U postgres`
+
+
+###Example Code
+
 ```
 using System;
 
