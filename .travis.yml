@@ -18,7 +18,6 @@ script:
 deploy:
   provider: script
   skip_cleanup: true
-  script: 
-    - cd Elephanet && nuget pack Elephanet.nuspec -Version $VERSION -IncludeReferencedProjects -Prop Configuration=Release && nuget push *.nupkg $NUGET_API_KEY -verbosity detailed
+  script: deploy.sh
   on:
     branch: master
