@@ -18,6 +18,7 @@ namespace Elephanet
         public StoreConventions(IJsonConverter jsonConverter)
         {
             _jsonConverter = jsonConverter;
+            _tableInfo = new TableInfo();
         }
 
         public StoreConventions(IJsonConverter jsonConverter, ITableInfo tableInfo)

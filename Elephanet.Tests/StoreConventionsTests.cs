@@ -11,10 +11,22 @@ namespace Elephanet.Tests
         {
             var jsonConverter = new JilJsonConverter();
             var info = new TableInfo();
+
             var convention = new StoreConventions(jsonConverter, info);
 
             convention.JsonConverter.ShouldBeSameAs(jsonConverter);
             convention.TableInfo.ShouldBeSameAs(info);
+        }
+
+        [Fact]
+        public void Ctor_Providing_IJsonConverter_Sets_JsonConverter_And_TableInfo_To_Default()
+        {
+            var jsonConverter = new JilJsonConverter();
+            
+            var conventions = new StoreConventions(jsonConverter);
+
+            conventions.JsonConverter.ShouldBeSameAs(jsonConverter);
+            conventions.TableInfo.ShouldBeOfType<TableInfo>();
         }
     }
 }
