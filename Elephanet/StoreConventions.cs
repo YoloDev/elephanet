@@ -6,9 +6,9 @@ namespace Elephanet
 {
     public class StoreConventions : IStoreConventions
     {
-
         IJsonConverter _jsonConverter;
-        private TableInfo _tableInfo;
+        private ITableInfo _tableInfo;
+
         public StoreConventions()
         {
             _jsonConverter = new JilJsonConverter();
@@ -20,12 +20,18 @@ namespace Elephanet
             _jsonConverter = jsonConverter;
         }
 
+        public StoreConventions(IJsonConverter jsonConverter, ITableInfo tableInfo)
+        {
+            _jsonConverter = jsonConverter;
+            _tableInfo = tableInfo;
+        }
+
         public IJsonConverter JsonConverter
         {
             get { return _jsonConverter; }
         }
 
-        public TableInfo TableInfo
+        public ITableInfo TableInfo
         {
             get { return _tableInfo; }
         }

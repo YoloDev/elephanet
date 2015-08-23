@@ -2,7 +2,11 @@
 
 namespace Elephanet
 {
-    public class TableInfo
+    /// <summary>
+    /// The default TableInfo which provides the default naming convention. Table names
+    /// are created based on the namespace and type name.
+    /// </summary>
+    public class TableInfo : ITableInfo
     {
         private string _schema;
 

@@ -16,7 +16,7 @@ namespace Elephanet
         protected readonly Dictionary<Guid, object> _entities = new Dictionary<Guid, object>();
         readonly IJsonConverter _jsonConverter;
         private JsonbQueryProvider _queryProvider;
-        private TableInfo _tableInfo;
+        private ITableInfo _tableInfo;
       
 
         public DocumentSession(IDocumentStore documentStore)
