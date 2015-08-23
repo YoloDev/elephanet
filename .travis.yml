@@ -3,9 +3,6 @@ env: VERSION=0.3.2
 solution: Elephanet.sln
 addons:
   postgresql: "9.4"
-branches:
-  only:
-    - master
 
 before_script:
   - psql -c "CREATE USER store_user with PASSWORD 'my super secret password';" -U postgres
@@ -17,4 +14,10 @@ script:
   - mono ./packages/xunit.runners.1.9.2/tools/xunit.console.clr4.exe  ./Elephanet.Tests/bin/Release/Elephanet.Tests.dll
   - chmod 755 ./packages/ILRepack.1.25.0/tools/ILRepack.exe
   - ./packages/ILRepack.1.25.0/tools/ILRepack.exe Elephanet/bin/Release/Elephanet.dll Elephanet/bin/Release/Sigil.dll Elephanet/bin/Release/Jil.dll Elephanet/bin/Release/Mono.Security.dll Elephanet/bin/Release/Npgsql.dll --internalize --out:Elephanet/Elephanet.dll
-  - cd Elephanet && nuget pack Elephanet.nuspec -Version $VERSION -IncludeReferencedProjects -Prop Configuration=Release && nuget push *.nupkg $NUGET_API_KEY -verbosity detailed
+
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: deploy.sh
+  on:
+    branch: master
