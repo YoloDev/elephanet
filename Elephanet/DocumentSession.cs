@@ -33,8 +33,8 @@ namespace Elephanet
         protected readonly Dictionary<Guid, object> _entities = new Dictionary<Guid, object>();
         readonly IJsonConverter _jsonConverter;
         private JsonbQueryProvider _queryProvider;
-        private TableInfo _tableInfo;
-      
+        private ITableInfo _tableInfo;
+
 
         public DocumentSession(IDocumentStore documentStore)
         {
@@ -70,27 +70,27 @@ namespace Elephanet
 
         }
 
-        public T LoadInternal<T>(Guid id) 
+        public T LoadInternal<T>(Guid id)
         {
 
             GetOrCreateTable(typeof(T));
-                using (var command = _conn.CreateCommand())
+            using (var command = _conn.CreateCommand())
+            {
+                command.CommandType = CommandType.Text;
+                command.CommandText = String.Format(@"SELECT body FROM {0} WHERE id = :id LIMIT 1;", _tableInfo.TableNameWithSchema(typeof(T)));
+
+                command.Parameters.AddWithValue(":id", id);
+
+                using (var reader = command.ExecuteReader())
                 {
-                    command.CommandType = CommandType.Text;
-                    command.CommandText = String.Format(@"SELECT body FROM {0} WHERE id = :id LIMIT 1;", _tableInfo.TableNameWithSchema(typeof(T)));
-
-                    command.Parameters.AddWithValue(":id", id);
-
-                    using (var reader = command.ExecuteReader())
+                    if (reader.Read())
                     {
-                        if (reader.Read())
-                        {
-                            return  _jsonConverter.Deserialize<T>(reader.GetString(0));
-                        }
-
-                        return default(T);
+                        return _jsonConverter.Deserialize<T>(reader.GetString(0));
                     }
+
+                    return default(T);
                 }
+            }
         }
 
         public IJsonbQueryable<T> Query<T>()
@@ -105,14 +105,14 @@ namespace Elephanet
             SaveInternal();
         }
 
-        HashSet<Tuple<Type, string,string>> MatchEntityToFinalTableAndTemporaryTable(Dictionary<Guid, object> entities)
+        HashSet<Tuple<Type, string, string>> MatchEntityToFinalTableAndTemporaryTable(Dictionary<Guid, object> entities)
         {
             HashSet<Tuple<Type, string, string>> typeToTableMap = new HashSet<Tuple<Type, string, string>>();
 
             var types = entities.Values.Select(v => v.GetType()).Distinct();
             foreach (Type type in types)
             {
-                typeToTableMap.Add(new Tuple<Type, string, string> ( type, _tableInfo.TableNameWithSchema(type), Guid.NewGuid().ToString() ));
+                typeToTableMap.Add(new Tuple<Type, string, string>(type, _tableInfo.TableNameWithSchema(type), Guid.NewGuid().ToString()));
             }
 
             return typeToTableMap;
@@ -122,7 +122,7 @@ namespace Elephanet
         {
             StringBuilder sb = new StringBuilder();
 
-            HashSet<Tuple<Type, string,string>> matches = MatchEntityToFinalTableAndTemporaryTable(_entities);
+            HashSet<Tuple<Type, string, string>> matches = MatchEntityToFinalTableAndTemporaryTable(_entities);
 
 
             foreach (var item in _entities)
@@ -134,12 +134,12 @@ namespace Elephanet
             sb.Append("BEGIN;");
             foreach (var match in matches)
             {
-                sb.Append(string.Format("CREATE TEMPORARY TABLE \"{0}\" (id uuid, body jsonb);", match.Item3)); 
+                sb.Append(string.Format("CREATE TEMPORARY TABLE \"{0}\" (id uuid, body jsonb);", match.Item3));
             }
 
             foreach (var item in _entities)
             {
-                sb.Append(string.Format("INSERT INTO \"{0}\" (id, body) VALUES ('{1}', '{2}');", matches.Where(c => c.Item1 == item.Value.GetType()).Select(j => j.Item3).First(),item.Key, _jsonConverter.Serialize(item.Value).EscapeQuotes()));
+                sb.Append(string.Format("INSERT INTO \"{0}\" (id, body) VALUES ('{1}', '{2}');", matches.Where(c => c.Item1 == item.Value.GetType()).Select(j => j.Item3).First(), item.Key, _jsonConverter.Serialize(item.Value).EscapeQuotes()));
             }
 
             foreach (var match in matches)
@@ -203,7 +203,7 @@ namespace Elephanet
             if (!_documentStore.StoreInfo.Tables.Contains(_tableInfo.TableNameWithSchema(type)))
             {
                 _documentStore.StoreInfo.Tables.Add(_tableInfo.TableNameWithSchema(type));
-                try 
+                try
                 {
                     using (var command = _conn.CreateCommand())
                     {
@@ -216,7 +216,7 @@ namespace Elephanet
                                 created time without time zone NOT NULL DEFAULT now(), 
                                 row_version integer NOT NULL DEFAULT 1, 
                                 CONSTRAINT pk_{1} PRIMARY KEY (id)
-                            );",_tableInfo.TableNameWithSchema(type), _tableInfo.TableNameWithoutSchema(type));
+                            );", _tableInfo.TableNameWithSchema(type), _tableInfo.TableNameWithoutSchema(type));
                         command.ExecuteNonQuery();
                     }
                 }
@@ -226,7 +226,7 @@ namespace Elephanet
                 }
                 try
                 {
-                        CreateIndex(type);
+                    CreateIndex(type);
                 }
                 catch (Exception exception)
                 {
@@ -266,29 +266,29 @@ namespace Elephanet
         {
 
             GetOrCreateTable(typeof(T));
-                 using (var command = _conn.CreateCommand())
+            using (var command = _conn.CreateCommand())
+            {
+                command.CommandType = CommandType.Text;
+                command.CommandText = String.Format(@"SELECT body FROM {0} WHERE id in ({1});", _tableInfo.TableNameWithSchema(typeof(T)), JoinAndCommaSeperateAndSurroundWithSingleQuotes(ids));
+                Console.WriteLine(command.CommandText);
+
+                List<T> entities = new List<T>();
+
+                using (var reader = command.ExecuteReader())
                 {
-                    command.CommandType = CommandType.Text;
-                    command.CommandText = String.Format(@"SELECT body FROM {0} WHERE id in ({1});", _tableInfo.TableNameWithSchema(typeof(T)), JoinAndCommaSeperateAndSurroundWithSingleQuotes(ids));
-                    Console.WriteLine(command.CommandText);
-
-                    List<T> entities = new List<T>();
-
-                    using (var reader = command.ExecuteReader())
+                    while (reader.Read())
                     {
-                        while (reader.Read())
-                        {
-                            T entity = _jsonConverter.Deserialize<T>(reader.GetString(0));
-                            entities.Add(entity);
-                        }
+                        T entity = _jsonConverter.Deserialize<T>(reader.GetString(0));
+                        entities.Add(entity);
                     }
-                    return entities;
                 }
+                return entities;
+            }
         }
 
         private string JoinAndCommaSeperateAndSurroundWithSingleQuotes<T>(IEnumerable<T> ids)
         {
-            return string.Join(",",ids.Select(n => n.ToString().SurroundWithSingleQuote()).ToArray());
+            return string.Join(",", ids.Select(n => n.ToString().SurroundWithSingleQuote()).ToArray());
         }
 
         public IEnumerable<T> GetAll<T>()

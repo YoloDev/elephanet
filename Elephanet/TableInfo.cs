@@ -2,7 +2,7 @@
 
 namespace Elephanet
 {
-    public class TableInfo
+    public class TableInfo : ITableInfo
     {
         private string _schema;
 
