@@ -1,3 +1,8 @@
+###v0.3.3 - 2015-08-24
+ 
+####Improvements
+  - Extract ITableInfo and inject into StoreConventions to allow overriding of table naming conventions with thanks to Frank Wise (https://github.com/fwise)
+
 ###v0.3.2 - 2015-08-23
 ####New Features
  - Add sql script for easy creation of data store database
