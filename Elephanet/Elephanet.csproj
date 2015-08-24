@@ -62,6 +62,7 @@
     <Compile Include="Expressions\SqlExpression.cs" />
     <Compile Include="IdentityFactory.cs" />
     <Compile Include="IDocumentSession.cs" />
+    <Compile Include="ITableInfo.cs" />
     <Compile Include="Serialization\IJsonConverter.cs" />
     <Compile Include="IStoreConventions.cs" />
     <Compile Include="IStore.cs" />

@@ -13,14 +13,14 @@ namespace Elephanet
     {
         const string columnName = "body";
         private StringBuilder _sb;
-        private TableInfo _tableInfo;
+        private ITableInfo _tableInfo;
 
         private Expression _where;
         private StringBuilder _limit;
         private StringBuilder _offset;
         private StringBuilder _orderBy;
 
-        public QueryTranslator(TableInfo tableInfo)
+        public QueryTranslator(ITableInfo tableInfo)
         {
             _sb = new StringBuilder();
             _limit = new StringBuilder();
