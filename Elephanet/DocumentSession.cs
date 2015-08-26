@@ -213,8 +213,7 @@ namespace Elephanet
                             (
                                 id uuid NOT NULL, 
                                 body jsonb NOT NULL, 
-                                created time without time zone NOT NULL DEFAULT now(), 
-                                row_version integer NOT NULL DEFAULT 1, 
+                                created time without time zone NOT NULL DEFAULT (now() at time zone 'utc'),
                                 CONSTRAINT pk_{1} PRIMARY KEY (id)
                             );", _tableInfo.TableNameWithSchema(type), _tableInfo.TableNameWithoutSchema(type));
                         command.ExecuteNonQuery();
