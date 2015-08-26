@@ -1,7 +1,12 @@
+###v0.3.5 - 2015-08-24
+ 
+####Improvements
+  -  Update time to timestamp (incorrectly implemented in past release)
+
 ###v0.3.4 - 2015-08-24
  
 ####Improvements
-  -  Create timestamp by default at UTC, picked up by Frank Wise (https://github.com/fwise)
+  -  Create time by default at UTC, picked up by Frank Wise (https://github.com/fwise)
 
 ###v0.3.3 - 2015-08-24
  
