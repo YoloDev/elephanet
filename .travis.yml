@@ -1,5 +1,5 @@
 language: csharp
-env: VERSION=0.3.5
+env: VERSION=0.3.6
 solution: Elephanet.sln
 addons:
   postgresql: "9.4"
@@ -10,7 +10,7 @@ before_script:
   - psql -c "GRANT ALL PRIVILEGES ON DATABASE store to store_user;" -U postgres
 
 script:
-  - xbuild /p:Configuration=Release Elephanet.sln 
+  - xbuild /p:Configuration=Release Elephanet.sln
   - mono ./packages/xunit.runners.1.9.2/tools/xunit.console.clr4.exe  ./Elephanet.Tests/bin/Release/Elephanet.Tests.dll
   - chmod 755 ./packages/ILRepack.1.25.0/tools/ILRepack.exe
   - ./packages/ILRepack.1.25.0/tools/ILRepack.exe Elephanet/bin/Release/Elephanet.dll Elephanet/bin/Release/Sigil.dll Elephanet/bin/Release/Jil.dll Elephanet/bin/Release/Mono.Security.dll Elephanet/bin/Release/Npgsql.dll --internalize --out:Elephanet/Elephanet.dll
@@ -18,7 +18,7 @@ script:
 deploy:
   provider: script
   skip_cleanup: true
-  script: 
+  script:
     - cd Elephanet && nuget pack Elephanet.nuspec -Version $VERSION -IncludeReferencedProjects -Prop Configuration=Release && nuget push *.nupkg $NUGET_API_KEY -verbosity detailed
   on:
     branch: master
