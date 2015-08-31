@@ -9,5 +9,6 @@ namespace Elephanet.Tests
         public string Model { get; set; }
         public string ImageUrl { get; set; }
         public string NumberPlate { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

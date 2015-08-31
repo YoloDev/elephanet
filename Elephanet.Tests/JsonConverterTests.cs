@@ -37,6 +37,30 @@ namespace Elephanet.Tests
             entity.Description.ShouldBe(_description);
         }
 
+        [Fact]
+        public void JsonConverter_GivenAnEntityWithDateTime_ShouldSerializeAndDeserialize()
+        {
+            var entity = new EntityWithDateTime();
+            var now = DateTime.UtcNow;
+            entity.CreatedAt = now;
+            string json = _converter.Serialize(entity);
+
+            var deSerializedEntity = _converter.Deserialize<EntityWithDateTime>(json);
+            deSerializedEntity.CreatedAt.ToString().ShouldBe(now.ToString());
+        }
+
+        [Fact]
+        public void JsonConverter_GivenAnInheritedEntityWithDateTime_ShouldSerializeAndDeserialize()
+        {
+            var entity = new AnotherEntityWithDateTime();
+            var now = DateTime.UtcNow;
+            entity.CreatedAt = now;
+            string json = _converter.Serialize(entity);
+
+            var deSerializedEntity = _converter.Deserialize<AnotherEntityWithDateTime>(json);
+            deSerializedEntity.CreatedAt.ToString().ShouldBe(now.ToString());
+        }
+
     }
 
     public class BaseEntity
@@ -47,5 +71,15 @@ namespace Elephanet.Tests
     public class AnotherEntity : BaseEntity
     {
        public string Description { get; set; } 
-    } 
+    }
+
+    public class EntityWithDateTime
+    {
+        public DateTime CreatedAt { get; set; }
+    }
+
+    public class AnotherEntityWithDateTime : BaseEntity
+    {
+        public DateTime CreatedAt { get; set; }
+    }
 }
