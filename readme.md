@@ -24,6 +24,12 @@ For Ubuntu (and likely other Debian based distros)
 4.  Alter create_store.sql file and replace "my super secret password" with your own password
 5.  run `psql -f create_store.sql -U postgres`
 
+###Got Questions?
+
+- https://jabbr.net/#/rooms/elephanet (chat) 
+- https://groups.google.com/d/forum/elephanet (forum)
+
+
 
 ###Example Code
 
