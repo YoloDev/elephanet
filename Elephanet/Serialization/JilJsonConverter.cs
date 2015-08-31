@@ -7,7 +7,7 @@ namespace Elephanet.Serialization
         private readonly Options _options;
         public JilJsonConverter()
         {
-            _options = new Options(includeInherited: true);
+            _options = new Options(includeInherited: true, dateFormat:DateTimeFormat.ISO8601);
         }
 
         public string Serialize<T>(T entity)
@@ -18,17 +18,17 @@ namespace Elephanet.Serialization
 
         public T Deserialize<T>(string json)
         {
-            return JSON.Deserialize<T>(json);
+            return JSON.Deserialize<T>(json,_options);
         }
 
         public object Deserialize(string json)
         {
-            return JSON.DeserializeDynamic(json);
+            return JSON.DeserializeDynamic(json, _options);
         }
 
         public object Deserialize(string json, System.Type type)
         {
-            return JSON.Deserialize(json, type);
+            return JSON.Deserialize(json, type,_options);
         }
     }
 }
