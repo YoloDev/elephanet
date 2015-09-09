@@ -55,8 +55,8 @@ namespace Elephanet.Tests
         public void GetById_Should_Throw_EntityNotFoundException()
         {
             using (var session = _store.OpenSession())
-            {
-                Assert.Throws<EntityNotFoundException>(() =>
+            {   
+                Should.Throw<EntityNotFoundException>(() =>
                 {
                     session.GetById<Car>(Guid.NewGuid());
                 });
