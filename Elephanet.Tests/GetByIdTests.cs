@@ -52,6 +52,29 @@ namespace Elephanet.Tests
         }
 
         [Fact]
+        public void GetById_Should_Throw_EntityNotFoundException()
+        {
+            using (var session = _store.OpenSession())
+            {
+                Assert.Throws<EntityNotFoundException>(() =>
+                {
+                    session.GetById<Car>(Guid.NewGuid());
+                });
+            }
+        }
+
+        [Fact]
+        public void GetById_Should_Return_Null_When_ReturnNull_Convention_Set()
+        {
+            var store = TestStore.CreateStoreWithEntityNotFoundBehaviorReturnNull();
+            using (var session = store.OpenSession())
+            {
+                session.GetById<Car>(Guid.NewGuid())
+                    .ShouldBe(null);
+            }
+        }
+
+        [Fact]
         public void GetAll_ShouldGetAll()
         {
             using (var session = _store.OpenSession())

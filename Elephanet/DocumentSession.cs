@@ -5,6 +5,7 @@ using System.Linq;
 using System.Data;
 using Elephanet.Serialization;
 using System.Text;
+using Elephanet.Conventions;
 using Elephanet.Helpers;
 
 
@@ -256,7 +257,12 @@ namespace Elephanet
 
             if (entity == null)
             {
-                throw new NullReferenceException(string.Format("Entity id {0} does not exist.", id));
+                if (_documentStore.Conventions.EntityNotFoundBehavior == EntityNotFoundBehavior.ReturnNull)
+                {
+                    return default(T);
+                }
+
+                throw new EntityNotFoundException(id, typeof (T));
             }
             return entity;
         }
