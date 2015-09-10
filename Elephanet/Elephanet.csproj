@@ -52,8 +52,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Conventions\EntityNotFoundBehavior.cs" />
     <Compile Include="DocumentSession.cs" />
     <Compile Include="EntityException.cs" />
+    <Compile Include="EntityNotFoundException.cs" />
     <Compile Include="Expressions\ExpressionEvaluator.cs" />
     <Compile Include="Expressions\SqlExpressionType.cs" />
     <Compile Include="Expressions\JsonbExpression.cs" />

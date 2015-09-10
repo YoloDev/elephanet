@@ -1,5 +1,6 @@
 ﻿using System;
 using Elephanet;
+using Elephanet.Conventions;
 using Elephanet.Serialization;
 
 namespace Elephanet
@@ -8,6 +9,7 @@ namespace Elephanet
     {
         IJsonConverter _jsonConverter;
         private ITableInfo _tableInfo;
+        private EntityNotFoundBehavior _entityNotFoundBehavior = EntityNotFoundBehavior.Throw;
 
         public StoreConventions()
         {
@@ -35,6 +37,17 @@ namespace Elephanet
         public ITableInfo TableInfo
         {
             get { return _tableInfo; }
+        }
+
+        public EntityNotFoundBehavior EntityNotFoundBehavior { get {return _entityNotFoundBehavior;} }
+
+        /// <summary>
+        /// Behavior of DocumentSession.GetById when the Entity is not found.
+        /// </summary>
+        /// <param name="behavior"></param>
+        public void SetEntityNotFoundBehavior(EntityNotFoundBehavior behavior)
+        {
+            _entityNotFoundBehavior = behavior;
         }
     }
 }

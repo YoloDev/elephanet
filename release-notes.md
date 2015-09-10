@@ -1,7 +1,12 @@
+###v0.3.8 - 2015-09-09
+
+####Improvements
+  -  GetById behavior (throw vs. returnnull) is now configurable via StoreConventions
+
 ###v0.3.7 - 2015-08-31
 
 ####Improvements
-  -  Modify the serlializer to serialize dates to ISO8601 by default fixing https://github.com/YoloDev/elephanet/issues/19
+  -  Modify the serializer to serialize dates to ISO8601 by default fixing https://github.com/YoloDev/elephanet/issues/19
 
 ###v0.3.6 - 2015-08-27
 

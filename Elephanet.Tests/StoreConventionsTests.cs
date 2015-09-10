@@ -1,4 +1,5 @@
-﻿using Elephanet.Serialization;
+﻿using Elephanet.Conventions;
+using Elephanet.Serialization;
 using Shouldly;
 using Xunit;
 
@@ -27,6 +28,23 @@ namespace Elephanet.Tests
 
             conventions.JsonConverter.ShouldBeSameAs(jsonConverter);
             conventions.TableInfo.ShouldBeOfType<TableInfo>();
+        }
+
+        [Fact]
+        public void EntityNotFoundBehavior_Defaults_To_Throw()
+        {
+            new StoreConventions()
+                .EntityNotFoundBehavior.ShouldBe(EntityNotFoundBehavior.Throw);
+        }
+
+        [Fact]
+        public void SetEntityNotFoundBehavior_Sets__EntityNotFoundBehavior()
+        {
+            var conventions = new StoreConventions();
+
+            conventions.SetEntityNotFoundBehavior(EntityNotFoundBehavior.ReturnNull);
+
+            conventions.EntityNotFoundBehavior.ShouldBe(EntityNotFoundBehavior.ReturnNull);
         }
     }
 }
