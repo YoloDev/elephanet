@@ -10,37 +10,37 @@ using NSubstitute;
 
 namespace Elephanet.Tests
 {
-    public class LinqTests : IDisposable
+    public class LinqTests : IClassFixture<DocumentStoreBaseFixture>, IDisposable
     {
         private IDocumentStore _store;
 
-        public LinqTests()
+        public LinqTests(DocumentStoreBaseFixture data)
         {
-            _store = new TestStore(); 
-            CreateDummyCars();
+            _store = data.TestStore; 
+            CreateDummyCar();
         }
 
-        public void CreateDummyCars()
+        public void CreateDummyCar()
         {
 
-            var dummyCars = new Fixture().Build<Car>()
+            var dummycar = new Fixture().Build<CarLinq>()
                .With(x => x.Make, "Subaru")
                .CreateMany();
 
-            var lowerCars = new Fixture().Build<Car>()
+            var lowercar = new Fixture().Build<CarLinq>()
                 .With(x => x.Make, "SAAB")
                 .CreateMany();
 
             using (var session = _store.OpenSession())
             {
-                foreach (var car in dummyCars)
+                foreach (var car in dummycar)
                 {
-                    session.Store<Car>(car);
+                    session.Store<CarLinq>(car);
                 }
 
-                foreach (var car in lowerCars)
+                foreach (var car in lowercar)
                 {
-                    session.Store<Car>(car);
+                    session.Store<CarLinq>(car);
                 }
                 session.SaveChanges();
             }
@@ -52,7 +52,7 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var results = session.Query<Car>().Where(x => x.Make == "Subaru").ToList();
+                var results = session.Query<CarLinq>().Where(x => x.Make == "Subaru").ToList();
                 results.ShouldNotBeEmpty();
             }
         }
@@ -62,11 +62,11 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var results = session.Query<Car>().Where(c => c.Make == "Subaru");
-                var cars = results.ToList();
-                cars.Count.ShouldBe(3);
-                cars.ShouldBeOfType<List<Car>>();
-                cars.ForEach(c => c.Make.ShouldBe("Subaru"));
+                var results = session.Query<CarLinq>().Where(c => c.Make == "Subaru");
+                var car = results.ToList();
+                car.Count.ShouldBe(3);
+                car.ShouldBeOfType<List<CarLinq>>();
+                car.ForEach(c => c.Make.ShouldBe("Subaru"));
               
             }
         }
@@ -77,11 +77,11 @@ namespace Elephanet.Tests
             string make = "Subaru";
             using (var session = _store.OpenSession())
             {
-                var results = session.Query<Car>().Where(c => c.Make == make);
-                var cars = results.ToList();
-                cars.Count.ShouldBe(3);
-                cars.ShouldBeOfType<List<Car>>();
-                cars.ForEach(c => c.Make.ShouldBe("Subaru"));
+                var results = session.Query<CarLinq>().Where(c => c.Make == make);
+                var car = results.ToList();
+                car.Count.ShouldBe(3);
+                car.ShouldBeOfType<List<CarLinq>>();
+                car.ForEach(c => c.Make.ShouldBe("Subaru"));
             }
 
         }
@@ -91,11 +91,11 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var results = session.Query<Car>().Where(c => c.Make == "saab".ToUpper());
-                var cars = results.ToList();
-                cars.Count.ShouldBe(3);
-                cars.ShouldBeOfType<List<Car>>();
-                cars.ForEach(c => c.Make.ShouldBe("SAAB"));
+                var results = session.Query<CarLinq>().Where(c => c.Make == "saab".ToUpper());
+                var car = results.ToList();
+                car.Count.ShouldBe(3);
+                car.ShouldBeOfType<List<CarLinq>>();
+                car.ForEach(c => c.Make.ShouldBe("SAAB"));
             }
 
         }
@@ -105,10 +105,10 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var results = session.Query<Car>().Where(c => c.Make == "SAAB").Take(2);
-                var cars = results.ToList();
-                cars.Count.ShouldBe(2);
-                cars.ShouldBeOfType<List<Car>>();
+                var results = session.Query<CarLinq>().Where(c => c.Make == "SAAB").Take(2);
+                var car = results.ToList();
+                car.Count.ShouldBe(2);
+                car.ShouldBeOfType<List<CarLinq>>();
             }
         }
 
@@ -117,10 +117,10 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var results = session.Query<Car>().Where(c => c.Make == "SAAB").Skip(2);
-                var cars = results.ToList();
-                cars.Count.ShouldBe(1);
-                cars.ShouldBeOfType<List<Car>>();
+                var results = session.Query<CarLinq>().Where(c => c.Make == "SAAB").Skip(2);
+                var car = results.ToList();
+                car.Count.ShouldBe(1);
+                car.ShouldBeOfType<List<CarLinq>>();
             }
 
         }
@@ -129,8 +129,18 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                session.DeleteAll<Car>();
+                session.DeleteAll<CarLinq>();
             }
         }
+    }
+
+    public class CarLinq
+    {
+        public Guid Id { get; set; }
+        public string Make { get; set; }
+        public string Model { get; set; }
+        public string ImageUrl { get; set; }
+        public string NumberPlate { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

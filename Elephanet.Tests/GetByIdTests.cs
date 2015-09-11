@@ -7,17 +7,15 @@ using System;
 
 namespace Elephanet.Tests
 {
-    public class GetByIdTests : IDisposable
+    public class GetByIdTests : IClassFixture<DocumentStoreBaseFixture>, IDisposable
     {
-        private readonly StoreInfo _testStore;
-        private readonly DocumentStore _store;
-        private readonly List<Car> dummyCars;
+        private readonly TestStore _store;
+        private readonly List<CarGetById> dummyCars;
 
-        public  GetByIdTests()
+        public GetByIdTests(DocumentStoreBaseFixture data)
         {
-            _testStore = new StoreInfo();
-            _store = new TestStore(); 
-            dummyCars =  new Fixture().CreateMany<Car>().ToList();
+            _store = data.TestStore; 
+            dummyCars = new Fixture().CreateMany<CarGetById>().ToList();
             using (var session = _store.OpenSession())
             {
                 foreach (var car in dummyCars)
@@ -34,7 +32,7 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var first = session.GetById<Car>(dummyCars[0].Id);
+                var first = session.GetById<CarGetById>(dummyCars[0].Id);
                 first.ShouldNotBe(null);
             }
         }
@@ -44,11 +42,10 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var cars = session.GetByIds<Car>(dummyCars.Select(c => c.Id).ToList()).ToList();
+                var cars = session.GetByIds<CarGetById>(dummyCars.Select(c => c.Id).ToList()).ToList();
                 cars[0].Id.ShouldBe(dummyCars[0].Id);
                 cars[2].Id.ShouldBe(dummyCars[2].Id);
             }
-
         }
 
         [Fact]
@@ -58,7 +55,7 @@ namespace Elephanet.Tests
             {   
                 Should.Throw<EntityNotFoundException>(() =>
                 {
-                    session.GetById<Car>(Guid.NewGuid());
+                    session.GetById<CarGetById>(Guid.NewGuid());
                 });
             }
         }
@@ -69,7 +66,7 @@ namespace Elephanet.Tests
             var store = TestStore.CreateStoreWithEntityNotFoundBehaviorReturnNull();
             using (var session = store.OpenSession())
             {
-                session.GetById<Car>(Guid.NewGuid())
+                session.GetById<CarGetById>(Guid.NewGuid())
                     .ShouldBe(null);
             }
         }
@@ -79,14 +76,29 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var cars = session.GetAll<Car>().ToList();
+                var cars = session.GetAll<CarGetById>().ToList();
                 cars.Count.ShouldBe(3);
             }
         }
 
         public void Dispose()
         {
-            _store.Destroy();
+            using (var session = _store.OpenSession())
+            {
+                session.DeleteAll<CarGetById>();
+            }
         }
+
+       
+    }
+
+    public class CarGetById
+    {
+        public Guid Id { get; set; }
+        public string Make { get; set; }
+        public string Model { get; set; }
+        public string ImageUrl { get; set; }
+        public string NumberPlate { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

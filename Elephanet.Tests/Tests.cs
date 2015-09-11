@@ -1,21 +1,18 @@
-﻿using Xunit;
-using Shouldly;
-using System;
-using Ploeh.AutoFixture;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
+using Ploeh.AutoFixture;
+using Shouldly;
+using Xunit;
 
 namespace Elephanet.Tests
 {
-    public class Tests : IDisposable
+    public class Tests : IClassFixture<DocumentStoreBaseFixture>, IDisposable
     {
-        private readonly StoreInfo _testStore;
-        private readonly DocumentStore _store;
+        private TestStore _store;
 
-        public  Tests()
+        public Tests(DocumentStoreBaseFixture data)
         {
-            _testStore = new StoreInfo();
-            _store = new TestStore(); 
+            _store = data.TestStore;
         }
             
         [Fact]
@@ -44,7 +41,7 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var car = new Car
+                var car = new CarTests
                 {
                     Id = Guid.NewGuid(),
                     Make = "Subaru",
@@ -53,7 +50,7 @@ namespace Elephanet.Tests
                     NumberPlate = "NRM1003" 
                 };
 
-                Should.NotThrow(() => session.Store<Car>(car));
+                Should.NotThrow(() => session.Store<CarTests>(car));
             }
 
         }
@@ -63,7 +60,7 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var car = new Car
+                var car = new CarTests
                 {
                     Id = Guid.NewGuid(),
                     Make = "Subaru",
@@ -72,7 +69,7 @@ namespace Elephanet.Tests
                     NumberPlate = "NRM1003"
                 };
 
-                session.Store<Car>(car);
+                session.Store<CarTests>(car);
                 session.SaveChanges();
             }
 
@@ -82,12 +79,12 @@ namespace Elephanet.Tests
         public void StoringAnEnitityAndFetchingWithinSession_Should_ReturnEntity()
         {
 
-            var dummyCar = new Fixture().Create<Car>();
+            var dummyCar = new Fixture().Create<CarTests>();
 
             using (var session = _store.OpenSession())
             {
-                session.Store<Car>(dummyCar);
-                var result = session.GetById<Car>(dummyCar.Id);
+                session.Store<CarTests>(dummyCar);
+                var result = session.GetById<CarTests>(dummyCar.Id);
                 result.Id.ShouldBe(dummyCar.Id);
                 result.Make.ShouldBe(dummyCar.Make);
                 result.Model.ShouldBe(dummyCar.Model);
@@ -108,17 +105,17 @@ namespace Elephanet.Tests
         public void SaveSessionThenLoading_Should_ReturnEntity()
         {
 
-            var dummyCar = new Fixture().Create<Car>();
+            var dummyCar = new Fixture().Create<CarTests>();
 
             using (var session = _store.OpenSession())
             {
-                session.Store<Car>(dummyCar);
+                session.Store<CarTests>(dummyCar);
                 session.SaveChanges();
             }
 
             using (var session = _store.OpenSession())
             {
-                var car = session.GetById<Car>(dummyCar.Id);
+                var car = session.GetById<CarTests>(dummyCar.Id);
                 car.Id.ShouldBe(dummyCar.Id);
                 car.Make.ShouldBe(dummyCar.Make);
                 car.Model.ShouldBe(dummyCar.Model);
@@ -131,12 +128,12 @@ namespace Elephanet.Tests
         public void SaveChangesWithMultipleDifferentClasses_Should_Save()
         {
 
-            var dummyCar = new Fixture().Create<Car>();
+            var dummyCar = new Fixture().Create<CarTests>();
             var dummyBike = new Fixture().Create<Bike>();
 
             using (var session = _store.OpenSession())
             {
-                session.Store<Car>(dummyCar);
+                session.Store<CarTests>(dummyCar);
                 session.Store<Bike>(dummyBike);
                 session.SaveChanges();
             }
@@ -144,7 +141,7 @@ namespace Elephanet.Tests
             using (var session = _store.OpenSession())
             {
                 session.GetById<Bike>(dummyBike.Id).ShouldNotBe(null);
-                session.GetById<Car>(dummyCar.Id).ShouldNotBe(null);
+                session.GetById<CarTests>(dummyCar.Id).ShouldNotBe(null);
             }
         }
 
@@ -153,7 +150,7 @@ namespace Elephanet.Tests
         public void SessionCanDeleteById()
         {
 
-            var dummyCars = new Fixture().Build<Car>()
+            var dummyCars = new Fixture().Build<CarTests>()
                 .With(x => x.Make, "Subaru")
                 .CreateMany().ToList();
             //setup
@@ -161,7 +158,7 @@ namespace Elephanet.Tests
             {
                 foreach (var car in dummyCars)
                 {
-                    session.Store<Car>(car);
+                    session.Store<CarTests>(car);
                 }
                 session.SaveChanges();
             }
@@ -170,14 +167,14 @@ namespace Elephanet.Tests
             {
                 foreach (var car in dummyCars)
                 {
-                    session.Delete<Car>(car.Id);
+                    session.Delete<CarTests>(car.Id);
                     session.SaveChanges();
                 }
             }
             //check
             using (var session = _store.OpenSession())
             {
-                var records = session.Query<Car>().Where(c => c.Make == "Subaru").ToList();
+                var records = session.Query<CarTests>().Where(c => c.Make == "Subaru").ToList();
                 records.Count.ShouldBe(0);
             }
         }
@@ -186,12 +183,12 @@ namespace Elephanet.Tests
         public void SaveChangesWithUpdates_Should_Persist()
         {
 
-            var dummyCar = new Fixture().Create<Car>();
+            var dummyCar = new Fixture().Create<CarTests>();
             var dummyBike = new Fixture().Create<Bike>();
 
             using (var session = _store.OpenSession())
             {
-                session.Store<Car>(dummyCar);
+                session.Store<CarTests>(dummyCar);
                 session.Store<Bike>(dummyBike);
                 session.SaveChanges();
             }
@@ -199,7 +196,7 @@ namespace Elephanet.Tests
             using (var session = _store.OpenSession())
             {
                 var retrievedBike = session.GetById<Bike>(dummyBike.Id);
-                var retrievedCar = session.GetById<Car>(dummyCar.Id);
+                var retrievedCar = session.GetById<CarTests>(dummyCar.Id);
 
                 retrievedBike.WheelSize = 900;
                 retrievedCar.Make = "Lada";
@@ -211,7 +208,7 @@ namespace Elephanet.Tests
             using (var session = _store.OpenSession())
             {
                 var alteredBike = session.GetById<Bike>(dummyBike.Id);
-                var alteredCar = session.GetById<Car>(dummyCar.Id);
+                var alteredCar = session.GetById<CarTests>(dummyCar.Id);
 
                 alteredBike.WheelSize.ShouldBe(900);
                 alteredCar.Make.ShouldBe("Lada");
@@ -222,7 +219,7 @@ namespace Elephanet.Tests
           [Fact]
         public void SaveChangesWithUpdates_Should_BeQueryable()
         {
-           var dummyCars = new Fixture().Build<Car>()
+           var dummyCars = new Fixture().Build<CarTests>()
           .With(x => x.Make, "Subaru")
           .CreateMany(100).ToList();
             using (var session = _store.OpenSession())
@@ -238,8 +235,8 @@ namespace Elephanet.Tests
               using (var session = _store.OpenSession())
               {
                   //retrieve a couple of cars
-                  var car1ToAlter = session.GetById<Car>(dummyCars[15].Id);
-                  var car2ToAlter = session.GetById<Car>(dummyCars[85].Id);
+                  var car1ToAlter = session.GetById<CarTests>(dummyCars[15].Id);
+                  var car2ToAlter = session.GetById<CarTests>(dummyCars[85].Id);
                   car1ToAlter.Make = "Ford";
                   car2ToAlter.Make = "Ford";
                   session.Store(car1ToAlter);
@@ -249,15 +246,26 @@ namespace Elephanet.Tests
 
               using (var session = _store.OpenSession())
               {
-                  var cars = session.Query<Car>().Where(c => c.Make == "Ford").ToList();
+                  var cars = session.Query<CarTests>().Where(c => c.Make == "Ford").ToList();
                   cars.Count.ShouldBe(2);
               }
         }
 
         public void Dispose()
         {
-            _store.Destroy();
+            //_store.Destroy();
+            using(var session = _store.OpenSession()) session.DeleteAll<CarTests>();
         }
+    }
+
+    public class CarTests
+    {
+        public Guid Id { get; set; }
+        public string Make { get; set; }
+        public string Model { get; set; }
+        public string ImageUrl { get; set; }
+        public string NumberPlate { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }
 
