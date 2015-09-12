@@ -6,31 +6,28 @@ using System;
 
 namespace Elephanet.Tests
 {
-    public class LinqOrderByTests : IDisposable
+    public class LinqOrderByTests : IClassFixture<DocumentStoreBaseFixture>, IDisposable
     {
-        private StoreInfo _testStore;
         private TestStore _store;
 
-        public LinqOrderByTests()
+        public LinqOrderByTests(DocumentStoreBaseFixture data)
         {
-            _testStore = new StoreInfo();
-            _store = new TestStore();
+            _store = data.TestStore;
 
-
-            var carA = new Fixture().Build<Car>()
+            var carA = new Fixture().Build<CarLinqOrder>()
               .With(x => x.Make, "Mazda")
               .With(y => y.Model, "A")
               .Create();
 
-            var carB = new Fixture().Build<Car>()
+            var carB = new Fixture().Build<CarLinqOrder>()
                 .With(x => x.Make, "Mazda")
                 .With(y => y.Model, "B")
                 .Create();
 
             using (var session = _store.OpenSession())
             {
-                session.Store<Car>(carA);
-                session.Store<Car>(carB);
+                session.Store(carA);
+                session.Store(carB);
                 session.SaveChanges();
             }
         }
@@ -40,7 +37,7 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var cars = session.Query<Car>().Where(c => c.Make == "Mazda").OrderBy(o => o.Model).ToList();
+                var cars = session.Query<CarLinqOrder>().Where(c => c.Make == "Mazda").OrderBy(o => o.Model).ToList();
                 cars[0].Model.ShouldBe("A");
                 cars[1].Model.ShouldBe("B");
             }
@@ -51,7 +48,7 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var cars = session.Query<Car>().Where(c => c.Make == "Mazda").OrderByDescending(o => o.Model).ToList();
+                var cars = session.Query<CarLinqOrder>().Where(c => c.Make == "Mazda").OrderByDescending(o => o.Model).ToList();
                 cars[0].Model.ShouldBe("B");
                 cars[1].Model.ShouldBe("A");
             }
@@ -61,8 +58,19 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                session.DeleteAll<Car>();
+                session.DeleteAll<CarLinqOrder>();
             }
         }
     }
+
+    public class CarLinqOrder
+    {
+        public Guid Id { get; set; }
+        public string Make { get; set; }
+        public string Model { get; set; }
+        public string ImageUrl { get; set; }
+        public string NumberPlate { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
 }
