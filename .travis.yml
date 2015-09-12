@@ -1,6 +1,6 @@
 language: csharp
 mono:
-  - 4.2
+  - alpha
 env: VERSION=0.3.8
 solution: Elephanet.sln
 addons:
