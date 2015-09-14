@@ -1,4 +1,5 @@
 ﻿using Elephanet.Tests;
+using Elephanet.Tests.Entities;
 using Ploeh.AutoFixture;
 using System.Collections.Generic;
 using System.Linq;

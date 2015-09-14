@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Elephanet.Tests.Entities;
 using Xunit;
 using Shouldly;
 
@@ -26,7 +24,7 @@ namespace Elephanet.Tests
         public void TableInfo_GivenAType_ShouldReturn_TheCorrectTableNameWithoutSchema()
         {
             TableInfo tableInfo = new TableInfo("aschema");
-            tableInfo.TableNameWithoutSchema(typeof(Car)).ShouldBe("elephanet_tests_car");
+            tableInfo.TableNameWithoutSchema(typeof(EntityForSchemaConventionsTest)).ShouldBe("elephanet_tests_entities_entityforschemaconventionstest");
  
         }
 
@@ -34,7 +32,7 @@ namespace Elephanet.Tests
         public void TableInfo_GivenAType_ShouldReturn_TheCorrectTableNameWithSchema()
         {
             TableInfo tableInfo = new TableInfo("aschema");
-            tableInfo.TableNameWithSchema(typeof(Car)).ShouldBe("aschema.elephanet_tests_car");
+            tableInfo.TableNameWithSchema(typeof(EntityForSchemaConventionsTest)).ShouldBe("aschema.elephanet_tests_entities_entityforschemaconventionstest");
 
         }
     }

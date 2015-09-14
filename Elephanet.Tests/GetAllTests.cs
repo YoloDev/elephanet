@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+using Elephanet.Tests.Entities;
 using Shouldly;
 using Xunit;
 
 namespace Elephanet.Tests
 {
-    public class GetAllTests : IClassFixture<DocumentStoreBaseFixture>, IDisposable
+    public class GetAllTests : IClassFixture<DocumentStoreBaseFixture> 
     {
-        private TestStore _store;
+        private readonly TestStore _store;
 
         public GetAllTests(DocumentStoreBaseFixture data)
         {
@@ -24,17 +23,5 @@ namespace Elephanet.Tests
                 things.Count.ShouldBe(0);
             }
         }
-
-        public void Dispose()
-        {
-            
-        }
-    }
-
-
-    public class SomeTestClassThatNoOneWillEverUse
-    {
-        public Guid Id { get; set; }
-        public string Something { get; set; }
     }
 }
