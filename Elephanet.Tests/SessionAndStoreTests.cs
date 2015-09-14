@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Linq;
+using Elephanet.Tests.Entities;
 using Ploeh.AutoFixture;
 using Shouldly;
 using Xunit;
 
 namespace Elephanet.Tests
 {
-    public class Tests : IClassFixture<DocumentStoreBaseFixture>, IDisposable
+    public class SessionAndStoreTests : IClassFixture<DocumentStoreBaseFixture>, IDisposable
     {
-        private TestStore _store;
+        private readonly TestStore _store;
 
-        public Tests(DocumentStoreBaseFixture data)
+        public SessionAndStoreTests(DocumentStoreBaseFixture data)
         {
             _store = data.TestStore;
         }
@@ -41,16 +42,16 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var car = new CarTests
+                var car = new EntityForSessionAndStoreTests
                 {
                     Id = Guid.NewGuid(),
-                    Make = "Subaru",
-                    Model = "Impreza",
-                    ImageUrl = "http://www.carsfotodb.com/uploads/subaru/subaru-impreza/subaru-impreza-08.jpg",
-                    NumberPlate = "NRM1003" 
+                    PropertyOne = "Subaru",
+                    PropertyTwo = "Impreza",
+                    PropertyThree = "http://www.carsfotodb.com/uploads/subaru/subaru-impreza/subaru-impreza-08.jpg",
+                    PropertyFour = "NRM1003" 
                 };
 
-                Should.NotThrow(() => session.Store<CarTests>(car));
+                Should.NotThrow(() => session.Store<EntityForSessionAndStoreTests>(car));
             }
 
         }
@@ -60,16 +61,16 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var car = new CarTests
+                var car = new EntityForSessionAndStoreTests
                 {
                     Id = Guid.NewGuid(),
-                    Make = "Subaru",
-                    Model = "Impreza",
-                    ImageUrl = "http://www.carsfotodb.com/uploads/subaru/subaru-impreza/subaru-impreza-08.jpg",
-                    NumberPlate = "NRM1003"
+                    PropertyOne = "Subaru",
+                    PropertyTwo = "Impreza",
+                    PropertyThree = "http://www.carsfotodb.com/uploads/subaru/subaru-impreza/subaru-impreza-08.jpg",
+                    PropertyFour = "NRM1003"
                 };
 
-                session.Store<CarTests>(car);
+                session.Store(car);
                 session.SaveChanges();
             }
 
@@ -79,17 +80,17 @@ namespace Elephanet.Tests
         public void StoringAnEnitityAndFetchingWithinSession_Should_ReturnEntity()
         {
 
-            var dummyCar = new Fixture().Create<CarTests>();
+            var dummyCar = new Fixture().Create<EntityForSessionAndStoreTests>();
 
             using (var session = _store.OpenSession())
             {
-                session.Store<CarTests>(dummyCar);
-                var result = session.GetById<CarTests>(dummyCar.Id);
+                session.Store(dummyCar);
+                var result = session.GetById<EntityForSessionAndStoreTests>(dummyCar.Id);
                 result.Id.ShouldBe(dummyCar.Id);
-                result.Make.ShouldBe(dummyCar.Make);
-                result.Model.ShouldBe(dummyCar.Model);
-                result.ImageUrl.ShouldBe(dummyCar.ImageUrl);
-                result.NumberPlate.ShouldBe(dummyCar.NumberPlate);
+                result.PropertyOne.ShouldBe(dummyCar.PropertyOne);
+                result.PropertyTwo.ShouldBe(dummyCar.PropertyTwo);
+                result.PropertyThree.ShouldBe(dummyCar.PropertyThree);
+                result.PropertyFour.ShouldBe(dummyCar.PropertyFour);
 
             }
         }
@@ -105,22 +106,22 @@ namespace Elephanet.Tests
         public void SaveSessionThenLoading_Should_ReturnEntity()
         {
 
-            var dummyCar = new Fixture().Create<CarTests>();
+            var dummyCar = new Fixture().Create<EntityForSessionAndStoreTests>();
 
             using (var session = _store.OpenSession())
             {
-                session.Store<CarTests>(dummyCar);
+                session.Store(dummyCar);
                 session.SaveChanges();
             }
 
             using (var session = _store.OpenSession())
             {
-                var car = session.GetById<CarTests>(dummyCar.Id);
+                var car = session.GetById<EntityForSessionAndStoreTests>(dummyCar.Id);
                 car.Id.ShouldBe(dummyCar.Id);
-                car.Make.ShouldBe(dummyCar.Make);
-                car.Model.ShouldBe(dummyCar.Model);
-                car.ImageUrl.ShouldBe(dummyCar.ImageUrl);
-                car.NumberPlate.ShouldBe(dummyCar.NumberPlate);
+                car.PropertyOne.ShouldBe(dummyCar.PropertyOne);
+                car.PropertyTwo.ShouldBe(dummyCar.PropertyTwo);
+                car.PropertyThree.ShouldBe(dummyCar.PropertyThree);
+                car.PropertyFour.ShouldBe(dummyCar.PropertyFour);
             }
         }
 
@@ -128,20 +129,20 @@ namespace Elephanet.Tests
         public void SaveChangesWithMultipleDifferentClasses_Should_Save()
         {
 
-            var dummyCar = new Fixture().Create<CarTests>();
-            var dummyBike = new Fixture().Create<Bike>();
+            var firstDummyEntity = new Fixture().Create<EntityForSessionAndStoreTests>();
+            var secondDummyEntity = new Fixture().Create<SecondEntityForSessionAndStoreTest>();
 
             using (var session = _store.OpenSession())
             {
-                session.Store<CarTests>(dummyCar);
-                session.Store<Bike>(dummyBike);
+                session.Store(firstDummyEntity);
+                session.Store(secondDummyEntity);
                 session.SaveChanges();
             }
 
             using (var session = _store.OpenSession())
             {
-                session.GetById<Bike>(dummyBike.Id).ShouldNotBe(null);
-                session.GetById<CarTests>(dummyCar.Id).ShouldNotBe(null);
+                session.GetById<SecondEntityForSessionAndStoreTest>(secondDummyEntity.Id).ShouldNotBe(null);
+                session.GetById<EntityForSessionAndStoreTests>(firstDummyEntity.Id).ShouldNotBe(null);
             }
         }
 
@@ -150,15 +151,15 @@ namespace Elephanet.Tests
         public void SessionCanDeleteById()
         {
 
-            var dummyCars = new Fixture().Build<CarTests>()
-                .With(x => x.Make, "Subaru")
+            var dummyCars = new Fixture().Build<EntityForSessionAndStoreTests>()
+                .With(x => x.PropertyOne, "Subaru")
                 .CreateMany().ToList();
             //setup
             using (var session = _store.OpenSession())
             {
                 foreach (var car in dummyCars)
                 {
-                    session.Store<CarTests>(car);
+                    session.Store(car);
                 }
                 session.SaveChanges();
             }
@@ -167,14 +168,14 @@ namespace Elephanet.Tests
             {
                 foreach (var car in dummyCars)
                 {
-                    session.Delete<CarTests>(car.Id);
+                    session.Delete<EntityForSessionAndStoreTests>(car.Id);
                     session.SaveChanges();
                 }
             }
             //check
             using (var session = _store.OpenSession())
             {
-                var records = session.Query<CarTests>().Where(c => c.Make == "Subaru").ToList();
+                var records = session.Query<EntityForSessionAndStoreTests>().Where(c => c.PropertyOne == "Subaru").ToList();
                 records.Count.ShouldBe(0);
             }
         }
@@ -183,23 +184,23 @@ namespace Elephanet.Tests
         public void SaveChangesWithUpdates_Should_Persist()
         {
 
-            var dummyCar = new Fixture().Create<CarTests>();
-            var dummyBike = new Fixture().Create<Bike>();
+            var firstDummyEntity = new Fixture().Create<EntityForSessionAndStoreTests>();
+            var secondDummyEntity = new Fixture().Create<SecondEntityForSessionAndStoreTest>();
 
             using (var session = _store.OpenSession())
             {
-                session.Store<CarTests>(dummyCar);
-                session.Store<Bike>(dummyBike);
+                session.Store(firstDummyEntity);
+                session.Store(secondDummyEntity);
                 session.SaveChanges();
             }
 
             using (var session = _store.OpenSession())
             {
-                var retrievedBike = session.GetById<Bike>(dummyBike.Id);
-                var retrievedCar = session.GetById<CarTests>(dummyCar.Id);
+                var retrievedBike = session.GetById<SecondEntityForSessionAndStoreTest>(secondDummyEntity.Id);
+                var retrievedCar = session.GetById<EntityForSessionAndStoreTests>(firstDummyEntity.Id);
 
                 retrievedBike.WheelSize = 900;
-                retrievedCar.Make = "Lada";
+                retrievedCar.PropertyOne = "Lada";
                 session.Store(retrievedCar);
                 session.Store(retrievedBike);
                 session.SaveChanges();
@@ -207,11 +208,11 @@ namespace Elephanet.Tests
 
             using (var session = _store.OpenSession())
             {
-                var alteredBike = session.GetById<Bike>(dummyBike.Id);
-                var alteredCar = session.GetById<CarTests>(dummyCar.Id);
+                var alteredBike = session.GetById<SecondEntityForSessionAndStoreTest>(secondDummyEntity.Id);
+                var alteredCar = session.GetById<EntityForSessionAndStoreTests>(firstDummyEntity.Id);
 
                 alteredBike.WheelSize.ShouldBe(900);
-                alteredCar.Make.ShouldBe("Lada");
+                alteredCar.PropertyOne.ShouldBe("Lada");
 
             }
         }
@@ -219,8 +220,8 @@ namespace Elephanet.Tests
           [Fact]
         public void SaveChangesWithUpdates_Should_BeQueryable()
         {
-           var dummyCars = new Fixture().Build<CarTests>()
-          .With(x => x.Make, "Subaru")
+           var dummyCars = new Fixture().Build<EntityForSessionAndStoreTests>()
+          .With(x => x.PropertyOne, "Subaru")
           .CreateMany(100).ToList();
             using (var session = _store.OpenSession())
             {
@@ -235,10 +236,10 @@ namespace Elephanet.Tests
               using (var session = _store.OpenSession())
               {
                   //retrieve a couple of cars
-                  var car1ToAlter = session.GetById<CarTests>(dummyCars[15].Id);
-                  var car2ToAlter = session.GetById<CarTests>(dummyCars[85].Id);
-                  car1ToAlter.Make = "Ford";
-                  car2ToAlter.Make = "Ford";
+                  var car1ToAlter = session.GetById<EntityForSessionAndStoreTests>(dummyCars[15].Id);
+                  var car2ToAlter = session.GetById<EntityForSessionAndStoreTests>(dummyCars[85].Id);
+                  car1ToAlter.PropertyOne = "Ford";
+                  car2ToAlter.PropertyOne = "Ford";
                   session.Store(car1ToAlter);
                   session.Store(car2ToAlter);
                   session.SaveChanges();
@@ -246,26 +247,19 @@ namespace Elephanet.Tests
 
               using (var session = _store.OpenSession())
               {
-                  var cars = session.Query<CarTests>().Where(c => c.Make == "Ford").ToList();
+                  var cars = session.Query<EntityForSessionAndStoreTests>().Where(c => c.PropertyOne == "Ford").ToList();
                   cars.Count.ShouldBe(2);
               }
         }
 
         public void Dispose()
         {
-            //_store.Destroy();
-            using(var session = _store.OpenSession()) session.DeleteAll<CarTests>();
+            using (var session = _store.OpenSession())
+            {
+                session.DeleteAll<EntityForSessionAndStoreTests>();
+                session.DeleteAll<SecondEntityForSessionAndStoreTest>();
+            }
         }
-    }
-
-    public class CarTests
-    {
-        public Guid Id { get; set; }
-        public string Make { get; set; }
-        public string Model { get; set; }
-        public string ImageUrl { get; set; }
-        public string NumberPlate { get; set; }
-        public DateTime CreatedAt { get; set; }
     }
 }
 
