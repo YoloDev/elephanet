@@ -64,20 +64,31 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bike.cs" />
-    <Compile Include="Car.cs" />
+    <Compile Include="Entities\EntityForWhereLinqTests.cs" />
+    <Compile Include="Entities\EntityForLinqOrderByTests.cs" />
+    <Compile Include="Entities\AnotherEntity.cs" />
+    <Compile Include="Entities\AnotherEntityWithDateTime.cs" />
+    <Compile Include="Entities\BaseEntity.cs" />
+    <Compile Include="Entities\Bike.cs" />
+    <Compile Include="Entities\Car.cs" />
     <Compile Include="DirtySpeedTests.cs" />
     <Compile Include="DocumentStoreBaseFixture.cs" />
+    <Compile Include="Entities\EntityForGetByIdTests.cs" />
+    <Compile Include="Entities\EntityWithDateTime.cs" />
+    <Compile Include="Entities\EntityForCorrectEscapingTests.cs" />
+    <Compile Include="Entities\EntityForSchemaConventionsTest.cs" />
+    <Compile Include="Entities\EntityForSessionAndStoreTests.cs" />
     <Compile Include="GetAllTests.cs" />
     <Compile Include="GetByIdTests.cs" />
     <Compile Include="JsonConverterTests.cs" />
     <Compile Include="LinqOrderByTests.cs" />
     <Compile Include="LinqTests.cs" />
-    <Compile Include="QueryTests.cs" />
+    <Compile Include="CorrectEscapingTests.cs" />
+    <Compile Include="Entities\SomeTestClassThatNoOneWillEverUse.cs" />
     <Compile Include="StoreConventionsTests.cs" />
     <Compile Include="StoreInfoTests.cs" />
     <Compile Include="TableInfoTests.cs" />
-    <Compile Include="Tests.cs" />
+    <Compile Include="SessionAndStoreTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestStore.cs" />
   </ItemGroup>
