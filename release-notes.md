@@ -1,3 +1,8 @@
+###v0.3.9 - 2015-09-14
+
+####Improvements
+  -  Improvements for thread safety, including running tests in parallel and general test tidyup 
+
 ###v0.3.8 - 2015-09-09
 
 ####Improvements
