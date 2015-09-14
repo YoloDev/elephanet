@@ -47,14 +47,14 @@ namespace Elephanet
             _queryProvider = new JsonbQueryProvider(_conn, _jsonConverter, _tableInfo);
         }
 
-        public void Delete<T>(Guid Id)
+        public void Delete<T>(Guid id)
         {
             GetOrCreateTable(typeof(T));
             using (var command = _conn.CreateCommand())
             {
                 command.CommandType = CommandType.Text;
                 command.CommandText = String.Format(@"Delete FROM {0} WHERE id = :id;", _tableInfo.TableNameWithSchema(typeof(T)));
-                command.Parameters.AddWithValue(":id", Id);
+                command.Parameters.AddWithValue(":id", id);
                 command.ExecuteNonQuery();
             }
         }
