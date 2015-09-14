@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Elephanet.Tests
+namespace Elephanet.Tests.Entities
 {
     public class Bike
     {
