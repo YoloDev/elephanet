@@ -1,5 +1,7 @@
 language: csharp
-env: VERSION=0.3.8
+mono:
+  - alpha
+env: VERSION=0.3.9
 solution: Elephanet.sln
 addons:
   postgresql: "9.4"
@@ -11,7 +13,7 @@ before_script:
 
 script:
   - xbuild /p:Configuration=Release Elephanet.sln
-  - mono ./packages/xunit.runners.1.9.2/tools/xunit.console.clr4.exe  ./Elephanet.Tests/bin/Release/Elephanet.Tests.dll
+  - mono ./packages/xunit.runner.console.2.0.0/tools/xunit.console.exe  ./Elephanet.Tests/bin/Release/Elephanet.Tests.dll -noshadow
   - chmod 755 ./packages/ILRepack.1.25.0/tools/ILRepack.exe
   - ./packages/ILRepack.1.25.0/tools/ILRepack.exe Elephanet/bin/Release/Elephanet.dll Elephanet/bin/Release/Sigil.dll Elephanet/bin/Release/Jil.dll Elephanet/bin/Release/Mono.Security.dll Elephanet/bin/Release/Npgsql.dll --internalize --out:Elephanet/Elephanet.dll
 

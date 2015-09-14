@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -7,7 +8,7 @@ namespace Elephanet
 {
     internal static class IdentityFactory
     {
-        static readonly Dictionary<Type, PropertyInfo> _keyCache = new Dictionary<Type, PropertyInfo>();
+        static readonly ConcurrentDictionary<Type, PropertyInfo> _keyCache = new ConcurrentDictionary<Type, PropertyInfo>();
 
         public static Guid SetEntityId(object value)
         {

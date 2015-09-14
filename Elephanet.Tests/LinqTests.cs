@@ -1,46 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
+using Elephanet.Tests.Entities;
 using Xunit;
 using Shouldly;
 using Ploeh.AutoFixture;
-using NSubstitute;
 
 
 namespace Elephanet.Tests
 {
-    public class LinqTests : IDisposable
+    public class LinqTests : IClassFixture<DocumentStoreBaseFixture>, IDisposable
     {
-        private IDocumentStore _store;
+        private readonly IDocumentStore _store;
 
-        public LinqTests()
+        public LinqTests(DocumentStoreBaseFixture data)
         {
-            _store = new TestStore(); 
-            CreateDummyCars();
+            _store = data.TestStore; 
+            CreateDummyCar();
         }
 
-        public void CreateDummyCars()
+        public void CreateDummyCar()
         {
 
-            var dummyCars = new Fixture().Build<Car>()
-               .With(x => x.Make, "Subaru")
+            var dummyEntity = new Fixture().Build<EntityForWhereLinqTests>()
+               .With(x => x.PropertyOne, "Subaru")
                .CreateMany();
 
-            var lowerCars = new Fixture().Build<Car>()
-                .With(x => x.Make, "SAAB")
+            var lowercasePropertyOneEntity = new Fixture().Build<EntityForWhereLinqTests>()
+                .With(x => x.PropertyOne, "SAAB")
                 .CreateMany();
 
             using (var session = _store.OpenSession())
             {
-                foreach (var car in dummyCars)
+                foreach (var entity in dummyEntity)
                 {
-                    session.Store<Car>(car);
+                    session.Store(entity);
                 }
 
-                foreach (var car in lowerCars)
+                foreach (var entity in lowercasePropertyOneEntity)
                 {
-                    session.Store<Car>(car);
+                    session.Store(entity);
                 }
                 session.SaveChanges();
             }
@@ -52,7 +51,7 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var results = session.Query<Car>().Where(x => x.Make == "Subaru").ToList();
+                var results = session.Query<EntityForWhereLinqTests>().Where(x => x.PropertyOne == "Subaru").ToList();
                 results.ShouldNotBeEmpty();
             }
         }
@@ -62,11 +61,11 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var results = session.Query<Car>().Where(c => c.Make == "Subaru");
-                var cars = results.ToList();
-                cars.Count.ShouldBe(3);
-                cars.ShouldBeOfType<List<Car>>();
-                cars.ForEach(c => c.Make.ShouldBe("Subaru"));
+                var results = session.Query<EntityForWhereLinqTests>().Where(c => c.PropertyOne == "Subaru");
+                var car = results.ToList();
+                car.Count.ShouldBe(3);
+                car.ShouldBeOfType<List<EntityForWhereLinqTests>>();
+                car.ForEach(c => c.PropertyOne.ShouldBe("Subaru"));
               
             }
         }
@@ -74,16 +73,15 @@ namespace Elephanet.Tests
         [Fact]
         public void WhereExpression_Should_HandleExpressionSubtrees()
         {
-            string make = "Subaru";
+            const string propertyOne = "Subaru";
             using (var session = _store.OpenSession())
             {
-                var results = session.Query<Car>().Where(c => c.Make == make);
-                var cars = results.ToList();
-                cars.Count.ShouldBe(3);
-                cars.ShouldBeOfType<List<Car>>();
-                cars.ForEach(c => c.Make.ShouldBe("Subaru"));
+                var results = session.Query<EntityForWhereLinqTests>().Where(c => c.PropertyOne == propertyOne);
+                var car = results.ToList();
+                car.Count.ShouldBe(3);
+                car.ShouldBeOfType<List<EntityForWhereLinqTests>>();
+                car.ForEach(c => c.PropertyOne.ShouldBe("Subaru"));
             }
-
         }
 
         [Fact]
@@ -91,11 +89,11 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var results = session.Query<Car>().Where(c => c.Make == "saab".ToUpper());
-                var cars = results.ToList();
-                cars.Count.ShouldBe(3);
-                cars.ShouldBeOfType<List<Car>>();
-                cars.ForEach(c => c.Make.ShouldBe("SAAB"));
+                var results = session.Query<EntityForWhereLinqTests>().Where(c => c.PropertyOne == "saab".ToUpper());
+                var car = results.ToList();
+                car.Count.ShouldBe(3);
+                car.ShouldBeOfType<List<EntityForWhereLinqTests>>();
+                car.ForEach(c => c.PropertyOne.ShouldBe("SAAB"));
             }
 
         }
@@ -105,10 +103,10 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var results = session.Query<Car>().Where(c => c.Make == "SAAB").Take(2);
-                var cars = results.ToList();
-                cars.Count.ShouldBe(2);
-                cars.ShouldBeOfType<List<Car>>();
+                var results = session.Query<EntityForWhereLinqTests>().Where(c => c.PropertyOne == "SAAB").Take(2);
+                var car = results.ToList();
+                car.Count.ShouldBe(2);
+                car.ShouldBeOfType<List<EntityForWhereLinqTests>>();
             }
         }
 
@@ -117,10 +115,10 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var results = session.Query<Car>().Where(c => c.Make == "SAAB").Skip(2);
-                var cars = results.ToList();
-                cars.Count.ShouldBe(1);
-                cars.ShouldBeOfType<List<Car>>();
+                var results = session.Query<EntityForWhereLinqTests>().Where(c => c.PropertyOne == "SAAB").Skip(2);
+                var car = results.ToList();
+                car.Count.ShouldBe(1);
+                car.ShouldBeOfType<List<EntityForWhereLinqTests>>();
             }
 
         }
@@ -129,7 +127,7 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                session.DeleteAll<Car>();
+                session.DeleteAll<EntityForWhereLinqTests>();
             }
         }
     }

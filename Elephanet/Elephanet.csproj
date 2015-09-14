@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConcurrentHashSet.cs" />
     <Compile Include="Conventions\EntityNotFoundBehavior.cs" />
     <Compile Include="DocumentSession.cs" />
     <Compile Include="EntityException.cs" />

@@ -1,4 +1,5 @@
-﻿using Ploeh.AutoFixture;
+﻿using Elephanet.Tests.Entities;
+using Ploeh.AutoFixture;
 using Xunit;
 using Shouldly;
 using System.Linq;
@@ -6,31 +7,28 @@ using System;
 
 namespace Elephanet.Tests
 {
-    public class LinqOrderByTests : IDisposable
+    public class LinqOrderByTests : IClassFixture<DocumentStoreBaseFixture>, IDisposable
     {
-        private StoreInfo _testStore;
-        private TestStore _store;
+        private readonly TestStore _store;
 
-        public LinqOrderByTests()
+        public LinqOrderByTests(DocumentStoreBaseFixture data)
         {
-            _testStore = new StoreInfo();
-            _store = new TestStore();
+            _store = data.TestStore;
 
-
-            var carA = new Fixture().Build<Car>()
-              .With(x => x.Make, "Mazda")
-              .With(y => y.Model, "A")
+            var carA = new Fixture().Build<EntityForLinqOrderByTests>()
+              .With(x => x.PropertyOne, "Mazda")
+              .With(y => y.PropertyTwo, "A")
               .Create();
 
-            var carB = new Fixture().Build<Car>()
-                .With(x => x.Make, "Mazda")
-                .With(y => y.Model, "B")
+            var carB = new Fixture().Build<EntityForLinqOrderByTests>()
+                .With(x => x.PropertyOne, "Mazda")
+                .With(y => y.PropertyTwo, "B")
                 .Create();
 
             using (var session = _store.OpenSession())
             {
-                session.Store<Car>(carA);
-                session.Store<Car>(carB);
+                session.Store(carA);
+                session.Store(carB);
                 session.SaveChanges();
             }
         }
@@ -40,9 +38,9 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var cars = session.Query<Car>().Where(c => c.Make == "Mazda").OrderBy(o => o.Model).ToList();
-                cars[0].Model.ShouldBe("A");
-                cars[1].Model.ShouldBe("B");
+                var cars = session.Query<EntityForLinqOrderByTests>().Where(c => c.PropertyOne == "Mazda").OrderBy(o => o.PropertyTwo).ToList();
+                cars[0].PropertyTwo.ShouldBe("A");
+                cars[1].PropertyTwo.ShouldBe("B");
             }
         }
 
@@ -51,9 +49,9 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                var cars = session.Query<Car>().Where(c => c.Make == "Mazda").OrderByDescending(o => o.Model).ToList();
-                cars[0].Model.ShouldBe("B");
-                cars[1].Model.ShouldBe("A");
+                var cars = session.Query<EntityForLinqOrderByTests>().Where(c => c.PropertyOne == "Mazda").OrderByDescending(o => o.PropertyTwo).ToList();
+                cars[0].PropertyTwo.ShouldBe("B");
+                cars[1].PropertyTwo.ShouldBe("A");
             }
         }
 
@@ -61,7 +59,7 @@ namespace Elephanet.Tests
         {
             using (var session = _store.OpenSession())
             {
-                session.DeleteAll<Car>();
+                session.DeleteAll<EntityForLinqOrderByTests>();
             }
         }
     }

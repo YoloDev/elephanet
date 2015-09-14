@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Elephanet.Tests.Entities;
 using Ploeh.AutoFixture;
 using System.Diagnostics;
 using Xunit;
@@ -10,9 +11,9 @@ namespace Elephanet.Tests
 {
     public class DirtySpeedTests : IDisposable
     {
-        DocumentStore _store;
-        const int writeCount = 50000;
-        Stopwatch _watch;
+        readonly DocumentStore _store;
+        const int WriteCount = 50000;
+        readonly Stopwatch _watch;
 
         public DirtySpeedTests()
         {
@@ -32,7 +33,7 @@ namespace Elephanet.Tests
         [Fact(Skip="Uncomment for a speed test")]
         public void InsertSpeedTest()
         {
-            var cars = GenerateCars(writeCount);
+            var cars = GenerateCars(WriteCount);
             _watch.Reset();
             _watch.Start();
             using (var session = _store.OpenSession())
@@ -45,15 +46,15 @@ namespace Elephanet.Tests
                 session.SaveChanges();
             }
             _watch.Stop();
-            var rate = writeCount / _watch.Elapsed.TotalSeconds;
-            Console.WriteLine(string.Format("{0} writes p/s",rate));
-            Console.WriteLine(string.Format("{0} writes in {1} seconds",writeCount, _watch.Elapsed.TotalSeconds));
+            var rate = WriteCount / _watch.Elapsed.TotalSeconds;
+            Console.WriteLine("{0} writes p/s", rate);
+            Console.WriteLine("{0} writes in {1} seconds", WriteCount, _watch.Elapsed.TotalSeconds);
         }
 
         [Fact(Skip="Uncomment for a speed test")]
         public void LinqWhereQuerySpeedTest()
         {
-            int seedNumber = 20000; //that should be enough to see if we are hitting the index nicely
+            const int seedNumber = 20000; //that should be enough to see if we are hitting the index nicely
             var cars = GenerateCars(seedNumber);
 
             //replace with a few other makes in there
@@ -81,7 +82,7 @@ namespace Elephanet.Tests
                 _watch.Stop();
             }
 
-            Console.WriteLine(string.Format("{0} ms for reading 3 records from {1} total (initial query)", _watch.Elapsed.TotalMilliseconds, seedNumber));
+            Console.WriteLine("{0} ms for reading 3 records from {1} total (initial query)", _watch.Elapsed.TotalMilliseconds, seedNumber);
 
         }
 
