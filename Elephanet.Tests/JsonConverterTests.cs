@@ -1,5 +1,6 @@
 ﻿using System;
 using Elephanet.Serialization;
+using Elephanet.Tests.Entities;
 using Shouldly;
 using Xunit;
 
@@ -61,25 +62,5 @@ namespace Elephanet.Tests
             deSerializedEntity.CreatedAt.ToString().ShouldBe(now.ToString());
         }
 
-    }
-
-    public class BaseEntity
-    {
-        public Guid Id { get; set; }
-    }
-
-    public class AnotherEntity : BaseEntity
-    {
-       public string Description { get; set; } 
-    }
-
-    public class EntityWithDateTime
-    {
-        public DateTime CreatedAt { get; set; }
-    }
-
-    public class AnotherEntityWithDateTime : BaseEntity
-    {
-        public DateTime CreatedAt { get; set; }
     }
 }
