@@ -8,7 +8,8 @@ namespace Elephanet
 {
     internal static class IdentityFactory
     {
-        static readonly ConcurrentDictionary<Type, PropertyInfo> _keyCache = new ConcurrentDictionary<Type, PropertyInfo>();
+        private static readonly ConcurrentDictionary<Type, PropertyInfo> _keyCache =
+            new ConcurrentDictionary<Type, PropertyInfo>();
 
         public static Guid SetEntityId(object value)
         {
@@ -20,7 +21,7 @@ namespace Elephanet
 
             try
             {
-                var id = (Guid)propertyInfo.GetValue(value, null);
+                var id = (Guid) propertyInfo.GetValue(value, null);
                 if (id != Guid.Empty)
                 {
                     return id;
@@ -47,7 +48,7 @@ namespace Elephanet
 
             try
             {
-                return (Guid)propertyInfo.GetValue(value, null);
+                return (Guid) propertyInfo.GetValue(value, null);
             }
             catch (Exception exception)
             {
@@ -55,23 +56,15 @@ namespace Elephanet
             }
         }
 
-        static bool TryGetIdProperty(object value, out PropertyInfo propertyInfo)
+        private static bool TryGetIdProperty(object value, out PropertyInfo propertyInfo)
         {
             var type = value.GetType();
 
-            if (_keyCache.ContainsKey(type))
-            {
-                propertyInfo = _keyCache[type];
-            }
-            else
-            {
-                propertyInfo = value.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                                   .Where(x => x.Name.Equals("id", StringComparison.OrdinalIgnoreCase))
-                                   .Where(x => x.PropertyType == typeof(Guid))
-                                   .FirstOrDefault(x => x.CanRead && x.CanWrite);
-
-                _keyCache[type] = propertyInfo;
-            }
+            propertyInfo = _keyCache.GetOrAdd(type,
+                typeofValue => typeofValue.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(x => x.Name.Equals("id", StringComparison.OrdinalIgnoreCase))
+                    .Where(x => x.PropertyType == typeof (Guid))
+                    .FirstOrDefault(x => x.CanRead && x.CanWrite));
 
             return (propertyInfo != null);
         }
