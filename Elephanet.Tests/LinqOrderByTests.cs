@@ -4,6 +4,7 @@ using Xunit;
 using Shouldly;
 using System.Linq;
 using System;
+using Elephanet.Tests.Infrastructure;
 
 namespace Elephanet.Tests
 {

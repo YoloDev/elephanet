@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Elephanet.Tests.Entities;
+using Elephanet.Tests.Infrastructure;
 using Ploeh.AutoFixture;
 using Shouldly;
 using Xunit;
@@ -25,7 +26,7 @@ namespace Elephanet.Tests
         [Fact]
         public void NewStore_ConnectionStringShouldBe_SameAsCtor()
         {
-            _store.ConnectionString.ShouldBe("Server=127.0.0.1;Port=5432;User id=store_user;password=my super secret password;database=store;");
+            _store.ConnectionString.ShouldBe("Server=127.0.0.1;Port=5432;User id=elephanet_tests_user;password=my super secret password;database=elephanet_tests_store;");
         }
 
         [Fact]

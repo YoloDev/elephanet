@@ -1,5 +1,6 @@
 ﻿using System;
 using Elephanet.Tests.Entities;
+using Elephanet.Tests.Infrastructure;
 using Xunit;
 using Shouldly;
 

@@ -80,6 +80,9 @@
     <Compile Include="Entities\EntityForSessionAndStoreTests.cs" />
     <Compile Include="GetAllTests.cs" />
     <Compile Include="GetByIdTests.cs" />
+    <Compile Include="Infrastructure\Resources.cs" />
+    <Compile Include="Infrastructure\TestStoreDatabaseFactory.cs" />
+    <Compile Include="Infrastructure\TestStore.cs" />
     <Compile Include="JsonConverterTests.cs" />
     <Compile Include="LinqOrderByTests.cs" />
     <Compile Include="LinqTests.cs" />
@@ -90,7 +93,6 @@
     <Compile Include="TableInfoTests.cs" />
     <Compile Include="SessionAndStoreTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestStore.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -104,6 +106,9 @@
       <Project>{f6f93a0a-0eb1-47a5-9089-db6f56369f98}</Project>
       <Name>Elephanet</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Infrastructure\CreateStore.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

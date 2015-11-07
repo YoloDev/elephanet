@@ -6,7 +6,6 @@ using Xunit;
 using Shouldly;
 using Ploeh.AutoFixture;
 
-
 namespace Elephanet.Tests
 {
     public class LinqTests : IClassFixture<DocumentStoreBaseFixture>, IDisposable

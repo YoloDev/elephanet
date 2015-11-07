@@ -5,6 +5,7 @@ using Ploeh.AutoFixture;
 using Shouldly;
 using Xunit;
 using System;
+using Elephanet.Tests.Infrastructure;
 
 namespace Elephanet.Tests
 {

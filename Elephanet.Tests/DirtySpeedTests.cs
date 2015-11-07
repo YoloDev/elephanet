@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Elephanet.Tests.Entities;
 using Ploeh.AutoFixture;
 using System.Diagnostics;
+using Elephanet.Tests.Infrastructure;
 using Xunit;
 
 namespace Elephanet.Tests
