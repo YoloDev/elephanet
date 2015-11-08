@@ -5,7 +5,9 @@ namespace Elephanet.Tests.Infrastructure
 {
     internal static class TestStoreDatabaseFactory
     {
-        private const string _psqlPath = @"C:\Program Files\PostgreSQL\9.4\bin\psql.exe"; //todo add alternative paths or move to config if necessary
+        //todo add alternative paths or move to config if necessary
+        private const string _psqlPath = @"C:\Program Files\PostgreSQL\9.4\bin\psql.exe";
+        private const string _psqlPathMono = "psql.exe";
         
         internal static void CreateCleanStoreDatabase()
         {
@@ -14,18 +16,20 @@ namespace Elephanet.Tests.Infrastructure
             var tempScriptFileName = WriteTempSqlScript();
             var command = $"-f {tempScriptFileName} -U postgres";
 
-            Debug.WriteLine($"Executing script {tempScriptFileName} with exe {_psqlPath} and command {command}.");
+            var path = Environment.IsRunningOnMono ? _psqlPathMono : _psqlPath;
 
-            StartAndOutputProcess(command);
+            Debug.WriteLine($"Executing script {tempScriptFileName} with exe {path} and command {command}.");
+
+            StartAndOutputProcess(path, command);
 
             Debug.WriteLine("Test Store Database Created");
 
             File.Delete(tempScriptFileName);
         }
 
-        private static void StartAndOutputProcess(string command)
+        private static void StartAndOutputProcess(string path, string command)
         {
-            var process = new Process { StartInfo = ProcessInfo(command) };
+            var process = new Process { StartInfo = ProcessInfo(path, command) };
             process.Start();
             WriteOutputToDebug(process);
         }
@@ -42,11 +46,11 @@ namespace Elephanet.Tests.Infrastructure
             }
         }
 
-        private static ProcessStartInfo ProcessInfo(string command)
+        private static ProcessStartInfo ProcessInfo(string path, string command)
         {
             return new ProcessStartInfo
             {
-                FileName = _psqlPath,
+                FileName = path,
                 Arguments = command,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
@@ -62,6 +66,5 @@ namespace Elephanet.Tests.Infrastructure
             File.WriteAllText(tempScriptFileName, script);
             return tempScriptFileName;
         }
-
     }
 }

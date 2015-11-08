@@ -80,6 +80,7 @@
     <Compile Include="Entities\EntityForSessionAndStoreTests.cs" />
     <Compile Include="GetAllTests.cs" />
     <Compile Include="GetByIdTests.cs" />
+    <Compile Include="Infrastructure\Environment.cs" />
     <Compile Include="Infrastructure\Resources.cs" />
     <Compile Include="Infrastructure\TestStoreDatabaseFactory.cs" />
     <Compile Include="Infrastructure\TestStore.cs" />
