@@ -7,7 +7,7 @@ namespace Elephanet.Tests.Infrastructure
     {
         //todo add alternative paths or move to config if necessary
         private const string _psqlPath = @"C:\Program Files\PostgreSQL\9.4\bin\psql.exe";
-        private const string _psqlPathMono = "psql.exe";
+        private const string _psqlPathMono = "psql";
         
         internal static void CreateCleanStoreDatabase()
         {
