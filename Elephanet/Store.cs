@@ -17,7 +17,7 @@ namespace Elephanet
         {
             _connectionString = connectionString;
             _conventions = new StoreConventions();
-            _storeInfo = new StoreInfo();;
+            _storeInfo = new StoreInfo(); ;
             _tableNames = new List<string>();
         }
 
@@ -42,9 +42,9 @@ namespace Elephanet
             _storeInfo = storeInfo;
         }
 
-        public IStoreConventions Conventions { get { return _conventions; }}
+        public IStoreConventions Conventions { get { return _conventions; } }
 
-        public List<string> TableNames { get {return _tableNames;} }
+        public List<string> TableNames { get { return _tableNames; } }
 
         public IDocumentSession OpenSession()
         {
@@ -55,64 +55,87 @@ namespace Elephanet
         {
             get { return _connectionString; }
         }
-    
-        public  IStoreInfo StoreInfo { get {return _storeInfo;}}
 
+        public IStoreInfo StoreInfo { get { return _storeInfo; } }
 
         public void Destroy()
         {
-              var connection = new NpgsqlConnection(_connectionString);
-              try
-              {
-                   connection.Open();
-                  foreach (var tablename in StoreInfo.Tables)
-                  {
-                    using (var command = connection.CreateCommand())
+            using (var connection = new NpgsqlConnection(_connectionString))
+            {
+                connection.Open();
+
+                var tableNames = GetTableNames(connection);
+                foreach (var tablename in tableNames)
+                {
+                    DropTable(connection, tablename);
+                }
+
+                _storeInfo.Clear();
+            }
+        }
+
+        private void DropTable(NpgsqlConnection connection, string tablename)
+        {
+            try
+            {
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.Text;
+                    command.CommandText = $@"drop table {_conventions.TableInfo.Schema}.{tablename};";
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (NpgsqlException exception)
+            {
+                throw new InvalidOperationException($"Could not drop table {tablename}; see the inner exception for more information.", exception);
+            }
+        }
+
+        private IEnumerable<string> GetTableNames(NpgsqlConnection connection)
+        {
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandType = CommandType.Text;
+                command.CommandText = $"SELECT table_name FROM information_schema.tables WHERE table_schema = '{_conventions.TableInfo.Schema}';";
+
+                var tables = new List<string>();
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
                     {
-                        command.CommandType = CommandType.Text;
-                        command.CommandText = String.Format(@"drop table {0};", tablename);
-                        command.ExecuteNonQuery();
+                        tables.Add(reader.GetString(0));
                     }
-                  }
-              } 
-
-              catch (NpgsqlException exception)
-              {
-                    throw new Exception(String.Format("Could not drop table {0}; see the inner exception for more information.", _storeInfo.Name), exception);
-              }
-
-              finally
-              {
-                    connection.Dispose();
-              }
+                }
+                return tables;
+            }
         }
 
         public void Empty()
         {
-              var connection = new NpgsqlConnection(_connectionString);
-              try
-              {
-                   connection.Open();
-                  foreach (var tablename in StoreInfo.Tables)
-                  {
+            var connection = new NpgsqlConnection(_connectionString);
+            try
+            {
+                connection.Open();
+                foreach (var tablename in StoreInfo.Tables)
+                {
                     using (var command = connection.CreateCommand())
                     {
                         command.CommandType = CommandType.Text;
                         command.CommandText = String.Format(@"delete from {0};", tablename);
                         command.ExecuteNonQuery();
                     }
-                  }
-              } 
+                }
+            }
 
-              catch (NpgsqlException exception)
-              {
-                    throw new Exception(String.Format("Could not delete all from table {0}; see the inner exception for more information.", _storeInfo.Name), exception);
-              }
+            catch (NpgsqlException exception)
+            {
+                throw new Exception(String.Format("Could not delete all from table {0}; see the inner exception for more information.", _storeInfo.Name), exception);
+            }
 
-              finally
-              {
-                    connection.Dispose();
-              }
+            finally
+            {
+                connection.Dispose();
+            }
         }
     }
 }

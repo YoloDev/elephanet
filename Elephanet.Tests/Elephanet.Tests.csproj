@@ -72,7 +72,6 @@
     <Compile Include="Entities\Bike.cs" />
     <Compile Include="Entities\Car.cs" />
     <Compile Include="DirtySpeedTests.cs" />
-    <Compile Include="DocumentStoreBaseFixture.cs" />
     <Compile Include="Entities\EntityForGetByIdTests.cs" />
     <Compile Include="Entities\EntityWithDateTime.cs" />
     <Compile Include="Entities\EntityForCorrectEscapingTests.cs" />

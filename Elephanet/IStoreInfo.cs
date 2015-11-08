@@ -12,5 +12,6 @@ namespace Elephanet
         string Name { get; }
         ConcurrentHashSet<string> Tables { get; }
         void Add(string tableName);
+        void Clear();
     }
 }

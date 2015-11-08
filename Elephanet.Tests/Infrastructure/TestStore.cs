@@ -13,6 +13,7 @@ namespace Elephanet.Tests.Infrastructure
 
         public TestStore() : this(new StoreConventions())
         {
+            Destroy();
         }
 
         private TestStore(IStoreConventions storeConventions) : base(TestDbConnectionString, storeConventions)

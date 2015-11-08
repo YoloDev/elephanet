@@ -20,6 +20,11 @@ namespace Elephanet
             _tableNames.Add(tableName);
         }
 
+        public void Clear()
+        {
+            _tableNames.Clear();
+        }
+
         public StoreInfo(string storeName)
         {
             _name = storeName;

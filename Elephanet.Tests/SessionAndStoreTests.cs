@@ -8,15 +8,15 @@ using Xunit;
 
 namespace Elephanet.Tests
 {
-    public class SessionAndStoreTests : IClassFixture<DocumentStoreBaseFixture>, IDisposable
+    public class SessionAndStoreTests
     {
         private readonly TestStore _store;
 
-        public SessionAndStoreTests(DocumentStoreBaseFixture data)
+        public SessionAndStoreTests()
         {
-            _store = data.TestStore;
+            _store = new TestStore();
         }
-            
+
         [Fact]
         public void WillPass()
         {
@@ -49,7 +49,7 @@ namespace Elephanet.Tests
                     PropertyOne = "Subaru",
                     PropertyTwo = "Impreza",
                     PropertyThree = "http://www.carsfotodb.com/uploads/subaru/subaru-impreza/subaru-impreza-08.jpg",
-                    PropertyFour = "NRM1003" 
+                    PropertyFour = "NRM1003"
                 };
 
                 Should.NotThrow(() => session.Store<EntityForSessionAndStoreTests>(car));
@@ -218,12 +218,12 @@ namespace Elephanet.Tests
             }
         }
 
-          [Fact]
+        [Fact]
         public void SaveChangesWithUpdates_Should_BeQueryable()
         {
-           var dummyCars = new Fixture().Build<EntityForSessionAndStoreTests>()
-          .With(x => x.PropertyOne, "Subaru")
-          .CreateMany(100).ToList();
+            var dummyCars = new Fixture().Build<EntityForSessionAndStoreTests>()
+           .With(x => x.PropertyOne, "Subaru")
+           .CreateMany(100).ToList();
             using (var session = _store.OpenSession())
             {
                 foreach (var car in dummyCars)
@@ -234,31 +234,22 @@ namespace Elephanet.Tests
 
             }
 
-              using (var session = _store.OpenSession())
-              {
-                  //retrieve a couple of cars
-                  var car1ToAlter = session.GetById<EntityForSessionAndStoreTests>(dummyCars[15].Id);
-                  var car2ToAlter = session.GetById<EntityForSessionAndStoreTests>(dummyCars[85].Id);
-                  car1ToAlter.PropertyOne = "Ford";
-                  car2ToAlter.PropertyOne = "Ford";
-                  session.Store(car1ToAlter);
-                  session.Store(car2ToAlter);
-                  session.SaveChanges();
-              }
-
-              using (var session = _store.OpenSession())
-              {
-                  var cars = session.Query<EntityForSessionAndStoreTests>().Where(c => c.PropertyOne == "Ford").ToList();
-                  cars.Count.ShouldBe(2);
-              }
-        }
-
-        public void Dispose()
-        {
             using (var session = _store.OpenSession())
             {
-                session.DeleteAll<EntityForSessionAndStoreTests>();
-                session.DeleteAll<SecondEntityForSessionAndStoreTest>();
+                //retrieve a couple of cars
+                var car1ToAlter = session.GetById<EntityForSessionAndStoreTests>(dummyCars[15].Id);
+                var car2ToAlter = session.GetById<EntityForSessionAndStoreTests>(dummyCars[85].Id);
+                car1ToAlter.PropertyOne = "Ford";
+                car2ToAlter.PropertyOne = "Ford";
+                session.Store(car1ToAlter);
+                session.Store(car2ToAlter);
+                session.SaveChanges();
+            }
+
+            using (var session = _store.OpenSession())
+            {
+                var cars = session.Query<EntityForSessionAndStoreTests>().Where(c => c.PropertyOne == "Ford").ToList();
+                cars.Count.ShouldBe(2);
             }
         }
     }

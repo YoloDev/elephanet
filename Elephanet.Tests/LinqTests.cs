@@ -2,25 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using Elephanet.Tests.Entities;
+using Elephanet.Tests.Infrastructure;
 using Xunit;
 using Shouldly;
 using Ploeh.AutoFixture;
 
 namespace Elephanet.Tests
 {
-    public class LinqTests : IClassFixture<DocumentStoreBaseFixture>, IDisposable
+    public class LinqTests
     {
-        private readonly IDocumentStore _store;
+        private readonly DocumentStore _store;
 
-        public LinqTests(DocumentStoreBaseFixture data)
+        public LinqTests()
         {
-            _store = data.TestStore; 
+            _store = new TestStore();
+
             CreateDummyCar();
         }
 
         public void CreateDummyCar()
         {
-
             var dummyEntity = new Fixture().Build<EntityForWhereLinqTests>()
                .With(x => x.PropertyOne, "Subaru")
                .CreateMany();
@@ -94,7 +95,6 @@ namespace Elephanet.Tests
                 car.ShouldBeOfType<List<EntityForWhereLinqTests>>();
                 car.ForEach(c => c.PropertyOne.ShouldBe("SAAB"));
             }
-
         }
 
         [Fact]
@@ -120,14 +120,6 @@ namespace Elephanet.Tests
                 car.ShouldBeOfType<List<EntityForWhereLinqTests>>();
             }
 
-        }
-
-        public void Dispose()
-        {
-            using (var session = _store.OpenSession())
-            {
-                session.DeleteAll<EntityForWhereLinqTests>();
-            }
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Elephanet.Tests.Entities;
 using Ploeh.AutoFixture;
 using System.Diagnostics;
@@ -10,7 +9,7 @@ using Xunit;
 
 namespace Elephanet.Tests
 {
-    public class DirtySpeedTests : IDisposable
+    public class DirtySpeedTests
     {
         readonly DocumentStore _store;
         const int WriteCount = 50000;
@@ -21,7 +20,6 @@ namespace Elephanet.Tests
             _store = new TestStore(); 
             _watch = new Stopwatch();
         }
-
 
         public List<Car> GenerateCars(int numberOfCars)
         {
@@ -84,15 +82,6 @@ namespace Elephanet.Tests
             }
 
             Console.WriteLine("{0} ms for reading 3 records from {1} total (initial query)", _watch.Elapsed.TotalMilliseconds, seedNumber);
-
-        }
-
-        public void Dispose()
-        {
-            using (var session = _store.OpenSession())
-            {
-                session.DeleteAll<Car>();
-            }
         }
     }
 }

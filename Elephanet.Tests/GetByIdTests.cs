@@ -9,14 +9,14 @@ using Elephanet.Tests.Infrastructure;
 
 namespace Elephanet.Tests
 {
-    public class GetByIdTests : IClassFixture<DocumentStoreBaseFixture>, IDisposable
+    public class GetByIdTests
     {
         private readonly TestStore _store;
         private readonly List<EntityForGetByIdTests> _dummyCars;
 
-        public GetByIdTests(DocumentStoreBaseFixture data)
+        public GetByIdTests()
         {
-            _store = data.TestStore; 
+            _store = new TestStore();
             _dummyCars = new Fixture().CreateMany<EntityForGetByIdTests>().ToList();
             using (var session = _store.OpenSession())
             {
@@ -82,15 +82,5 @@ namespace Elephanet.Tests
                 cars.Count.ShouldBe(3);
             }
         }
-
-        public void Dispose()
-        {
-            using (var session = _store.OpenSession())
-            {
-                session.DeleteAll<EntityForGetByIdTests>();
-            }
-        }
-
-       
     }
 }

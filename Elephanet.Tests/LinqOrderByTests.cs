@@ -8,13 +8,13 @@ using Elephanet.Tests.Infrastructure;
 
 namespace Elephanet.Tests
 {
-    public class LinqOrderByTests : IClassFixture<DocumentStoreBaseFixture>, IDisposable
+    public class LinqOrderByTests
     {
         private readonly TestStore _store;
 
-        public LinqOrderByTests(DocumentStoreBaseFixture data)
+        public LinqOrderByTests()
         {
-            _store = data.TestStore;
+            _store = new TestStore();
 
             var carA = new Fixture().Build<EntityForLinqOrderByTests>()
               .With(x => x.PropertyOne, "Mazda")
@@ -53,14 +53,6 @@ namespace Elephanet.Tests
                 var cars = session.Query<EntityForLinqOrderByTests>().Where(c => c.PropertyOne == "Mazda").OrderByDescending(o => o.PropertyTwo).ToList();
                 cars[0].PropertyTwo.ShouldBe("B");
                 cars[1].PropertyTwo.ShouldBe("A");
-            }
-        }
-
-        public void Dispose()
-        {
-            using (var session = _store.OpenSession())
-            {
-                session.DeleteAll<EntityForLinqOrderByTests>();
             }
         }
     }

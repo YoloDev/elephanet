@@ -6,22 +6,21 @@ using Shouldly;
 
 namespace Elephanet.Tests
 {
-    public class CorrectEscapingTests : IClassFixture<DocumentStoreBaseFixture>, IDisposable
+    public class CorrectEscapingTests
     {
         private readonly TestStore _store;
         private EntityForCorrectEscapingTests _entity;
 
-        public CorrectEscapingTests(DocumentStoreBaseFixture data)
+        public CorrectEscapingTests()
         {
-            _store = data.TestStore;
+            _store = new TestStore();
         }
 
         [Fact]
         public void SingleQuotes_ShouldBe_EscapedWhenSaving()
         {
-            _entity = new EntityForCorrectEscapingTests() {Id = Guid.NewGuid(), PropertyOne = "Kia", PropertyTwo = "Cee'd"};
-
-
+            _entity = new EntityForCorrectEscapingTests() { Id = Guid.NewGuid(), PropertyOne = "Kia", PropertyTwo = "Cee'd" };
+                
             //save the car
             using (var session = _store.OpenSession())
             {
@@ -36,15 +35,6 @@ namespace Elephanet.Tests
                 savedCar.PropertyTwo.ShouldBe("Cee'd");
                 savedCar.PropertyOne.ShouldBe("Kia");
             }
-        }
-
-        public void Dispose()
-        {
-            using (var session = _store.OpenSession())
-            {
-                session.Delete<EntityForCorrectEscapingTests>(_entity.Id);
-                session.SaveChanges();
-            } 
         }
     }
 }

@@ -6,13 +6,13 @@ using Xunit;
 
 namespace Elephanet.Tests
 {
-    public class GetAllTests : IClassFixture<DocumentStoreBaseFixture> 
+    public class GetAllTests
     {
         private readonly TestStore _store;
 
-        public GetAllTests(DocumentStoreBaseFixture data)
+        public GetAllTests()
         {
-            _store = data.TestStore;
+            _store = new TestStore();
         }
 
         [Fact]
