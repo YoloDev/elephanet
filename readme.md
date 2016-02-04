@@ -1,3 +1,8 @@
+##Please Note##
+
+In the interest in not wasting peoples time, if you are considering using elephanet, please take a look at http://jasperfx.github.io/marten/ as it's far more complete that this project, with a far more active
+contributer base, yet it follows many of the same goals.
+
 [![Build Status](https://travis-ci.org/YoloDev/elephanet.svg?branch=master)](https://travis-ci.org/YoloDev/elephanet) 
 ##Elephanet - A .NET document database built on PostgreSQL.##
 
